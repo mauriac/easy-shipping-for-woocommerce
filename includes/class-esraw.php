@@ -154,9 +154,8 @@ class Esraw {
 
 		$plugin_admin = new Esraw_Admin( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-
+		$this->loader->add_action( 'woocommerce_shipping_init', $plugin_admin, 'init_shipping_method' );
+		$this->loader->add_filter( 'woocommerce_shipping_methods', $plugin_admin, 'add_easy_rate_shipping_method' );
 	}
 
 	/**
@@ -170,8 +169,7 @@ class Esraw {
 
 		$plugin_public = new Esraw_Public( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'woocommerce_after_shipping_rate', $plugin_public, 'display_shipping_description_on_cart', 10, 2 );
 
 	}
 

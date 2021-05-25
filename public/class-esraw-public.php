@@ -53,4 +53,14 @@ class Esraw_Public {
 		$this->version = $version;
 
 	}
+
+	public function display_shipping_description_on_cart( $method, $index ) {
+		$easy_shipping        = new Esraw_Shipping_Easy_Rate( $method->get_instance_id() );
+		$description_for_user = $easy_shipping->get_instance_option( Esraw_Shipping_Easy_Rate::METHOD_DESCRIPTION, '' );
+		if ( $description_for_user ) {
+			?>
+				<small><p class="shipping-method-description"><?php echo $description_for_user; ?></p></small>
+			<?php
+		}
+	}
 }

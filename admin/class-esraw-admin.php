@@ -53,4 +53,16 @@ class Esraw_Admin {
 		$this->version     = $version;
 
 	}
+
+	/**
+	 * Initialize plugin.
+	 */
+	function init_shipping_method() {
+		new Esraw_Shipping_Easy_Rate();
+	}
+
+	public function add_easy_rate_shipping_method( $methods ) {
+		$methods['esrw'] = 'Esraw_Shipping_Easy_Rate';
+		return $methods;
+	}
 }
