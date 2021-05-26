@@ -61,11 +61,11 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 		$this->method_description = __( 'Easy way to define your shipping method', 'esraw-woo' );
 		$this->enabled            = isset( $this->settings['enabled'] ) ? $this->settings['enabled'] : 'yes';
 		$this->title              = $this->get_instance_option( self::METHOD_TITLE, $this->method_title );
-		$this->min_amount       = $this->get_option( self::METHOD_FREE_MIN_AMOUNT, 0 );
-		$this->requires         = $this->get_option( self::METHOD_FREE_REQUIRES );
-		$this->ignore_discounts = $this->get_option( self::METHOD_FREE_IGN_DISC );
+		$this->min_amount         = $this->get_option( self::METHOD_FREE_MIN_AMOUNT, 0 );
+		$this->requires           = $this->get_option( self::METHOD_FREE_REQUIRES );
+		$this->ignore_discounts   = $this->get_option( self::METHOD_FREE_IGN_DISC );
 
-		$this->tax_status         = $this->get_instance_option( self::METHOD_TAXABLE );
+		$this->tax_status = $this->get_instance_option( self::METHOD_TAXABLE );
 
 		add_action( 'admin_footer', array( 'Esraw_Shipping_Easy_Rate', 'enqueue_admin_js' ), 10 ); // Priority needs to be higher than wc_print_js (25).
 	}
@@ -125,11 +125,11 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'type'  => 'title',
 			),
 			self::METHOD_FREE_REQUIRES       => array(
-				'title'   => __( 'Free shipping requires...', 'woocommerce' ),
-				'type'    => 'select',
-				'class'   => 'wc-enhanced-select',
-				'default' => '',
-				'options' => array(
+				'title'       => __( 'Free shipping requires...', 'woocommerce' ),
+				'type'        => 'select',
+				'class'       => 'wc-enhanced-select',
+				'default'     => '',
+				'options'     => array(
 					''           => __( 'N/A', 'woocommerce' ),
 					'coupon'     => __( 'A valid free shipping coupon', 'woocommerce' ),
 					'min_amount' => __( 'A minimum order amount', 'woocommerce' ),
@@ -139,7 +139,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'description' => __( 'Condition for free shipping. Choose N/A to disable it.', 'esraw-woo' ),
 				'desc_tip'    => true,
 			),
-			self::METHOD_FREE_MIN_AMOUNT       => array(
+			self::METHOD_FREE_MIN_AMOUNT     => array(
 				'title'       => __( 'Minimum order amount', 'woocommerce' ),
 				'type'        => 'price',
 				'placeholder' => wc_format_localized_price( 0 ),
@@ -206,8 +206,8 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 		if ( ! $this->is_visible_for_user() ) {
 			return;
 		}
-		$cost                       = 0;
-		$label                      = $this->title;
+		$cost  = 0;
+		$label = $this->title;
 		if ( $this->is_free_shipping ) {
 			$cost  = 0;
 			$label = $this->get_instance_option( self::METHOD_FREE_SHIPPING_LABEL, $this->title );
