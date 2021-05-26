@@ -215,7 +215,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			$cost = $this->get_instance_option( self::METHOD_MINIMUM_COST, 0 );
 		}
 		$max_cost = $this->get_instance_option( self::METHOD_MAXIMUM_COST, 0 );
-		if ( $cost > $max_cost ) {
+		if ( !empty( $max_cost ) && $cost > $max_cost ) {
 			$cost = $max_cost;
 		}
 
