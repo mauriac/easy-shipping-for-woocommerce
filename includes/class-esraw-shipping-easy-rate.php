@@ -17,6 +17,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	const METHOD_FREE_SHIPPING_LABEL = 'method_free_shipping_label';
 	const METHOD_VISIBILITY          = 'method_visibility';
 	const METHOD_MINIMUM_COST        = 'method_minimum_cost';
+	const METHOD_MAXIMUM_COST        = 'method_maximum_cost';
 
 	/**
 	 * Min amount to be valid.
@@ -181,6 +182,14 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'description' => __( 'Enter the minimum price for this shipment.', 'esraw-woo' ),
 				'desc_tip'    => true,
 			),
+			self::METHOD_MAXIMUM_COST        => array(
+				'title'       => __( 'Shipping maximum cost', 'esraw-woo' ),
+				'type'        => 'price',
+				'label'       => ' ',
+				'default'     => null,
+				'description' => __( 'Enter the maximum price for this shipment.', 'esraw-woo' ),
+				'desc_tip'    => true,
+			),
 		);
 
 		$this->instance_form_fields = $settings;
@@ -204,6 +213,10 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			$label = $this->get_instance_option( self::METHOD_FREE_SHIPPING_LABEL, $this->title );
 		} else {
 			$cost = $this->get_instance_option( self::METHOD_MINIMUM_COST, 0 );
+		}
+		$max_cost = $this->get_instance_option( self::METHOD_MAXIMUM_COST, 0 );
+		if ( $cost > $max_cost ) {
+			$cost = $max_cost;
 		}
 
 		$rate = array(
