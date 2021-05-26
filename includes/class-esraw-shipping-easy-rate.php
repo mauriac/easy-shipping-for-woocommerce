@@ -125,7 +125,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'type'  => 'title',
 			),
 			self::METHOD_FREE_REQUIRES       => array(
-				'title'       => __( 'Free shipping requires...', 'woocommerce' ),
+				'title'       => __( 'Free shipping requires', 'woocommerce' ),
 				'type'        => 'select',
 				'class'       => 'wc-enhanced-select',
 				'default'     => '',
@@ -316,8 +316,8 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			"jQuery( function( $ ) {
 				function wcFreeShippingShowHideMinAmountField( el ) {
 					var form = $( el ).closest( 'form' );
-					var minAmountField = $( '#woocommerce_esraw_min_amount', form ).closest( 'tr' );
-					var ignoreDiscountField = $( '#woocommerce_esraw_ignore_discounts', form ).closest( 'tr' );
+					var minAmountField = $( '#woocommerce_esraw_method_free_min_amount', form ).closest( 'tr' );
+					var ignoreDiscountField = $( '#woocommerce_esraw_method_free_ignore_discounts', form ).closest( 'tr' );
 					if ( 'coupon' === $( el ).val() || '' === $( el ).val() ) {
 						minAmountField.hide();
 						ignoreDiscountField.hide();
@@ -327,15 +327,15 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 					}
 				}
 
-				$( document.body ).on( 'change', '#woocommerce_esraw_requires', function() {
+				$( document.body ).on( 'change', '#woocommerce_esraw_method_free_requires', function() {
 					wcFreeShippingShowHideMinAmountField( this );
 				});
 
 				// Change while load.
-				$( '#woocommerce_esraw_requires' ).change();
+				$( '#woocommerce_esraw_method_free_requires' ).change();
 				$( document.body ).on( 'wc_backbone_modal_loaded', function( evt, target ) {
 					if ( 'wc-modal-shipping-method-settings' === target ) {
-						wcFreeShippingShowHideMinAmountField( $( '#wc-backbone-modal-dialog #woocommerce_esraw_requires', evt.currentTarget ) );
+						wcFreeShippingShowHideMinAmountField( $( '#wc-backbone-modal-dialog #woocommerce_esraw_method_free_requires', evt.currentTarget ) );
 					}
 				} );
 			});"
