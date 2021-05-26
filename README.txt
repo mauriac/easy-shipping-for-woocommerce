@@ -7,7 +7,7 @@ Tested up to: 5.7
 Requires PHP: 7.0
 WC requires at least: 4.0.0
 WC tested up to: 5.3.0
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,12 +24,20 @@ Easy Shipping for Woocommerce is easy, and flexible shipping plugin for WooComme
 <ul>
 <li>Create multiple custom flat rate shipping methods</li>
 <li>Create a free shipping</li>
+<li>Advanced free shipping configuration</li>
 <li>Add description to your shipping method that will be display for user</li>
+<li>Set minimum and maximum shipping amount</li>
 </ul>
 
 == Screenshots ==
+1. shipping configuration screen
+2. show shipping in cart
 
 == Changelog ==
+
+= 1.0.1 =
+* Add more option for free shipping.
+* Shipping can have max amount.
 
 = 1.0 =
 * This is first version.
