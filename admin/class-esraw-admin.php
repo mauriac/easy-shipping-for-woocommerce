@@ -55,9 +55,62 @@ class Esraw_Admin {
 	}
 
 	/**
+	 * Register the stylesheets for the admin area.
+	 *
+	 * @since    1.0.0
+	 */
+	public function enqueue_styles() {
+
+		/**
+		 * This function is provided for demonstration purposes only.
+		 *
+		 * An instance of this class should be passed to the run() function
+		 * defined in Rsw_Loader as all of the hooks are defined
+		 * in that particular class.
+		 *
+		 * The Rsw_Loader will then create the relationship
+		 * between the defined hooks and the functions defined in this
+		 * class.
+		 */
+
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rsw-admin.css', array(), $this->version, 'all' );
+
+	}
+
+	/**
+	 * Register the JavaScript for the admin area.
+	 *
+	 * @since    1.0.0
+	 */
+	public function enqueue_scripts() {
+
+		/**
+		 * This function is provided for demonstration purposes only.
+		 *
+		 * An instance of this class should be passed to the run() function
+		 * defined in Rsw_Loader as all of the hooks are defined
+		 * in that particular class.
+		 *
+		 * The Rsw_Loader will then create the relationship
+		 * between the defined hooks and the functions defined in this
+		 * class.
+		 */
+
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/esraw-admin.js', array( 'jquery' ), $this->version, false );
+
+		$data = array(
+			'esraw_condition_choices' => Esraw_Shipping_Easy_Rate::CONDITION_CHOICES,
+			'esraw_operator'          => Esraw_Shipping_Easy_Rate::Operator,
+			'esraw_currency_symbol'   => get_woocommerce_currency_symbol(),
+		);
+		wp_localize_script( $this->plugin_name, 'esr_vars', $data );
+
+	}
+
+	/**
 	 * Initialize plugin.
 	 */
-	function init_shipping_method() {
+	public function init_shipping_method() {
 		new Esraw_Shipping_Easy_Rate();
 	}
 

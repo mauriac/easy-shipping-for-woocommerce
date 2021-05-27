@@ -18,6 +18,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	const METHOD_VISIBILITY          = 'method_visibility';
 	const METHOD_MINIMUM_COST        = 'method_minimum_cost';
 	const METHOD_MAXIMUM_COST        = 'method_maximum_cost';
+	const METHOD_RULE_CALCULATION    = 'method_rule_calculation';
 
 	/**
 	 * Min amount to be valid.
@@ -39,6 +40,34 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	 * @var string
 	 */
 	private $is_free_shipping;
+
+	const CONDITION_CHOICES = array(
+		'Cart'                => array(
+			'Subtotal' => 'subtotal',
+		),
+		'Weight & Dimensions' => array(
+			'Weight' => 'weight',
+		),
+	);
+	const Operator = array(
+		'is'     => 'is',
+		'is_not' => 'is not',
+	);
+
+	/**
+	 *
+	 */
+	private $conditions_option_key;
+
+	/**
+	 *
+	 */
+	private $conditions_key;
+
+	/**
+	 *
+	 */
+	private $conditions_options;
 
 	/**
 	 * Constructor for your shipping class
@@ -66,6 +95,14 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 		$this->ignore_discounts   = $this->get_option( self::METHOD_FREE_IGN_DISC );
 
 		$this->tax_status = $this->get_instance_option( self::METHOD_TAXABLE );
+
+		$this->conditions_key        = 'easy_rate';
+		$this->conditions_option_key = $this->id . $this->instance_id;
+
+		if ( isset( $_POST['esr_securite_nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['esr_securite_nonce'] ), 'esr-security' ) ) {
+			update_option( $this->conditions_option_key, ( isset( $_POST[ $this->conditions_key ] ) && is_array( $_POST[ $this->conditions_key ] ) ) ? $_POST[ $this->conditions_key ] : array() );
+		}
+		$this->conditions_options = get_option( $this->conditions_option_key, array() );
 
 		add_action( 'admin_footer', array( 'Esraw_Shipping_Easy_Rate', 'enqueue_admin_js' ), 10 ); // Priority needs to be higher than wc_print_js (25).
 	}
@@ -190,10 +227,123 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'description' => __( 'Enter the maximum price for this shipment.', 'esraw-woo' ),
 				'desc_tip'    => true,
 			),
+			self::METHOD_RULE_CALCULATION    => array(
+				'title'       => __( 'Rules Calculation', 'esraw-woo' ),
+				'type'        => 'select',
+				'default'     => 'sum',
+				'options'     => array(
+					'sum' => __( 'Sum', 'esraw-woo' ),
+				),
+				'description' => __( 'Select how rules will be calculated.', 'esraw-woo' ),
+				'desc_tip'    => true,
+			),
 		);
 
 		$this->instance_form_fields = $settings;
 		$this->form_fields          = array(); // No global options for table rates
+	}
+
+	/**
+	 * Return admin options as a html string.
+	 *
+	 * @return string
+	 */
+	public function get_admin_options_html() {
+		ob_start();
+		$this->instance_options();
+		return ob_get_clean();
+	}
+
+	/**
+	 * admin_options function.
+	 */
+	public function instance_options() {
+		?>
+		<table class="form-table">
+			<?php
+			$this->generate_settings_html( $this->get_instance_form_fields() );
+			?>
+			<tr>
+				<td>
+				<h2><?php esc_attr_e( 'Rules for calculating shipping costs', 'esr-woo' ); ?></h2>
+				<input type="hidden" name="esr_securite_nonce" value="<?php echo esc_html( wp_create_nonce( 'esr-security' ) ); ?>"/>
+					<table id="esr-woo-table" class="widefat">
+						<thead>
+							<tr>
+								<th>
+									<input type="checkbox" id="esr_remove_all_tr" class="esr_remove_all_tr">
+								</th>
+								<th>
+									<?php esc_attr_e( 'Condition', 'esr-woo' ); ?>
+								</th>
+								<th>
+									<?php esc_attr_e( 'Cost', 'esr-woo' ); ?>
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<th colspan="2">
+									<a href="#" class="button" id="esr-insert-new-row"><?php _e( 'Insert row', 'esr-woo' ); ?></a>
+								</th>
+								<th colspan="3">
+									<a href="#" class="button" id="esr-remove-rows"><?php _e( 'Delete Selected Row(s)', 'esr-woo' ); ?></a>
+								</th>
+							</tr>
+						</tfoot>
+						<tbody>
+							<?php foreach ( $this->conditions_options as $key => $condition ) : ?>
+								<tr  data-key="<?php esc_attr_e( $key ); ?>" >
+									<td>
+										<input type="checkbox" data-num="<?php esc_attr_e( $key ); ?>" class="esr_remove_tr">
+									</td>
+									<td>
+										<div class="easy_rate_condition_content" id="easy_rate_condition_content_<?php esc_attr_e( $key ); ?>">
+											<select id="easy_rate_condition_<?php esc_attr_e( $key ); ?>" name="easy_rate[<?php esc_attr_e( $key ); ?>][condition]">
+												<option></option>
+												<?php foreach ( self::CONDITION_CHOICES as $groupe => $choices ) : ?>
+													<optgroup label="<?php esc_attr_e( $groupe ); ?>">
+														<?php foreach ( $choices as $choice_name => $choice_value ) : ?>
+															<option value="<?php esc_attr_e( $choice_value ); ?>" <?php ( $choice_value === $condition['condition'] ) ? esc_attr_e( 'selected' ) : ''; ?>>
+																<?php esc_attr_e( $choice_name ); ?>
+															</option>
+														<?php endforeach; ?>
+													</optgroup>
+												<?php endforeach; ?>
+											</select>
+											<span class="easy_rate_operator_content" id="easy_rate_operator_content_<?php esc_attr_e( $key ); ?>">
+												<select id="easy_rate_operator_<?php esc_attr_e( $key ); ?>" name="easy_rate[<?php esc_attr_e( $key ); ?>][operator]" required>
+													<?php foreach ( self::Operator as $op_key => $operat ) : ?>
+														<option value="<?php esc_attr_e( $op_key ); ?>" <?php ( $op_key === $condition['operator'] ) ? esc_attr_e( 'selected' ) : ''; ?>>
+															<?php esc_attr_e( $operat ); ?>
+														</option>
+													<?php endforeach; ?>
+												</select>
+												<input type="number"  step="0.01" value="<?php esc_attr_e( $condition['operand1'] ); ?>" placeholder="from" name="easy_rate[<?php esc_attr_e( $key ); ?>][operand1]"/>
+												<input type="number" step="0.01" value="<?php esc_attr_e( $condition['operand2'] ); ?>" placeholder="to" name="easy_rate[<?php esc_attr_e( $key ); ?>][operand2]"/>
+												<?php
+													$unit = '';
+												if ( 'subtotal' === $condition['condition'] ) {
+													$unit = get_woocommerce_currency_symbol();
+												} elseif ( 'weight' === $condition['condition'] || 'dimension' === $condition['condition'] ) {
+													$unit = 'kg';
+												}
+												?>
+												<div class="easy_rate_unit"><?php echo esc_attr( $unit ); ?> </div>
+											</span>
+										</div>
+									</td>
+									<td>
+										<input type="number"  step="0.01" value="<?php esc_attr_e( $condition['cost'] ); ?>" name="easy_rate[<?php esc_attr_e( $key ); ?>][cost]" required/>
+									</td>
+								</tr>
+							<?php endforeach; ?>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<?php
 	}
 
 	/**
@@ -212,10 +362,33 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			$cost  = 0;
 			$label = $this->get_instance_option( self::METHOD_FREE_SHIPPING_LABEL, $this->title );
 		} else {
-			$cost = $this->get_instance_option( self::METHOD_MINIMUM_COST, 0 );
+			$cost           = $this->get_instance_option( self::METHOD_MINIMUM_COST, 0 );
+			$conditions_ops = $this->conditions_options;
+			foreach ( $conditions_ops as $condition_row => $condition ) {
+				if ( 'subtotal' === $condition['condition'] ) {
+					$value_to_check = $package['cart_subtotal'];
+				} elseif ( 'weight' === $condition['condition'] ) {
+					$value_to_check = WC()->cart->get_cart_contents_weight();
+				}
+
+				$can_get_cost = false;
+				if ( ( $condition['operand1'] <= $value_to_check || '' === $condition['operand1'] ) && ( $condition['operand2'] >= $value_to_check || '' === $condition['operand2'] ) ) {
+					$can_get_cost = true;
+				}
+				if ( 'is_not' === $condition['operator'] ) {
+					$can_get_cost = ! $can_get_cost;
+				}
+
+				if ( $can_get_cost ) {
+					$cost_calculation = $this->get_instance_option( self::METHOD_RULE_CALCULATION, 'sum' );
+					if ( 'sum' === $cost_calculation ) {
+						$cost += $condition['cost'];
+					}
+				}
+			}
 		}
 		$max_cost = $this->get_instance_option( self::METHOD_MAXIMUM_COST, 0 );
-		if ( !empty( $max_cost ) && $cost > $max_cost ) {
+		if ( ! empty( $max_cost ) && $cost > $max_cost ) {
 			$cost = $max_cost;
 		}
 

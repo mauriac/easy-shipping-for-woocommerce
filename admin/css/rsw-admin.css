@@ -1,0 +1,10 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+.easy_rate_operator_content {
+    display: flex;
+}
+.easy_rate_condition_content {
+    display: flex;
+}
