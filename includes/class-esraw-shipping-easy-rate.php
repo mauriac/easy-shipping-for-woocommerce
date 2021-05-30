@@ -545,11 +545,6 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 
 				// Change while load.
 				$( '#woocommerce_esraw_method_free_requires' ).change();
-				$( document.body ).on( 'wc_backbone_modal_loaded', function( evt, target ) {
-					if ( 'wc-modal-shipping-method-settings' === target ) {
-						wcFreeShippingShowHideMinAmountField( $( '#wc-backbone-modal-dialog #woocommerce_esraw_method_free_requires', evt.currentTarget ) );
-					}
-				} );
 			});"
 		);
 	}
