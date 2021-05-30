@@ -7,7 +7,7 @@ Tested up to: 5.7
 Requires PHP: 7.0
 WC requires at least: 4.0.0
 WC tested up to: 5.3.0
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,10 +23,13 @@ It allows you to create multiple custom flat rate shipping methods based on cond
 Easy Shipping for Woocommerce is easy, and flexible shipping plugin for WooCommerce store owners. It's including the following:
 <ul>
 <li>Create multiple custom flat rate shipping methods</li>
-<li>Create a free shipping</li>
+<li>Free shipping coupons support</li>
+<li>Set minimum and maximum shipping cost</li>
 <li>Advanced free shipping configuration</li>
 <li>Add description to your shipping method that will be display for user</li>
-<li>Set minimum and maximum shipping amount</li>
+<li>Set minimum and maximum shipping cost</li>
+<li>Conditional Shipping Cost</li>
+<li>Shipping cost based on cart total and/or weight</li>
 </ul>
 
 == Screenshots ==
@@ -34,6 +37,9 @@ Easy Shipping for Woocommerce is easy, and flexible shipping plugin for WooComme
 2. show shipping in cart
 
 == Changelog ==
+
+= 1.0.2 =
+* Conditional Shipping Cost.
 
 = 1.0.1 =
 * Add more option for free shipping.
