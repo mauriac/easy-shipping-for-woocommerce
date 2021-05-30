@@ -14,6 +14,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	const METHOD_FREE_REQUIRES       = 'method_free_requires';
 	const METHOD_FREE_MIN_AMOUNT     = 'method_free_min_amount';
 	const METHOD_FREE_IGN_DISC       = 'method_free_ignore_discounts';
+	const METHOD_FREE_USER_POSTCODE  = 'method_free_user_postcode';
 	const METHOD_FREE_SHIPPING_LABEL = 'method_free_shipping_label';
 	const METHOD_VISIBILITY          = 'method_visibility';
 	const METHOD_MINIMUM_COST        = 'method_minimum_cost';
@@ -33,6 +34,13 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	 * @var string
 	 */
 	private $requires = '';
+
+	/**
+	 * Requires postcodes.
+	 *
+	 * @var string
+	 */
+	private $postcode_need = '';
 
 	/**
 	 * Whether or not is free shipping.
@@ -91,6 +99,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 		$this->enabled            = isset( $this->settings['enabled'] ) ? $this->settings['enabled'] : 'yes';
 		$this->title              = $this->get_instance_option( self::METHOD_TITLE, $this->method_title );
 		$this->min_amount         = $this->get_option( self::METHOD_FREE_MIN_AMOUNT, 0 );
+		$this->postcode_need      = $this->get_option( self::METHOD_FREE_USER_POSTCODE, null );
 		$this->requires           = $this->get_option( self::METHOD_FREE_REQUIRES );
 		$this->ignore_discounts   = $this->get_option( self::METHOD_FREE_IGN_DISC );
 
@@ -168,6 +177,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'default'     => '',
 				'options'     => array(
 					''           => __( 'N/A', 'woocommerce' ),
+					'postcode'   => __( 'A user postcode', 'esraw-woo' ),
 					'coupon'     => __( 'A valid free shipping coupon', 'woocommerce' ),
 					'min_amount' => __( 'A minimum order amount', 'woocommerce' ),
 					'either'     => __( 'A minimum order amount OR a coupon', 'woocommerce' ),
@@ -190,6 +200,13 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'type'        => 'checkbox',
 				'description' => __( 'If checked, free shipping would be available based on pre-discount order amount.', 'woocommerce' ),
 				'default'     => 'no',
+				'desc_tip'    => true,
+			),
+			self::METHOD_FREE_USER_POSTCODE     => array(
+				'title'       => __( 'User Postcode', 'esraw-woo' ),
+				'type'        => 'text',
+				'placeholder' => 'postcode1,postcode2,etc',
+				'description' => __( 'Users with this Postal Code will get free shipping (if enabled above). To match several post codes separate them with commas', 'esraw-woo' ),
 				'desc_tip'    => true,
 			),
 			self::METHOD_FREE_SHIPPING_LABEL => array(
@@ -453,6 +470,16 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			}
 		}
 
+		$has_met_postcode = false;
+		if ( in_array( $this->requires, array( 'postcode' ), true ) ) {
+			$customer_post_code = WC()->customer->get_shipping_postcode();
+			$p_code_slice       = explode( ',', $this->postcode_need );
+
+			if ( in_array( $customer_post_code, $p_code_slice, true ) ) {
+				$has_met_postcode = true;
+			}
+		}
+
 		switch ( $this->requires ) {
 			case 'min_amount':
 				$is_available = $has_met_min_amount;
@@ -465,6 +492,9 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				break;
 			case 'either':
 				$is_available = $has_met_min_amount || $has_coupon;
+				break;
+			case 'postcode':
+				$is_available = $has_met_postcode;
 				break;
 			default:
 				$is_available = false;
@@ -491,12 +521,21 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 					var form = $( el ).closest( 'form' );
 					var minAmountField = $( '#woocommerce_esraw_method_free_min_amount', form ).closest( 'tr' );
 					var ignoreDiscountField = $( '#woocommerce_esraw_method_free_ignore_discounts', form ).closest( 'tr' );
+					var userPostcodeField = $( '#woocommerce_esraw_method_free_user_postcode', form ).closest( 'tr' );
 					if ( 'coupon' === $( el ).val() || '' === $( el ).val() ) {
 						minAmountField.hide();
 						ignoreDiscountField.hide();
+						userPostcodeField.hide();
 					} else {
-						minAmountField.show();
-						ignoreDiscountField.show();
+						minAmountField.hide();
+						ignoreDiscountField.hide();
+						userPostcodeField.hide();
+						if ( 'postcode' === $( el ).val() ) {
+							userPostcodeField.show();
+						} else {
+							minAmountField.show();
+							ignoreDiscountField.show();
+						}
 					}
 				}
 
