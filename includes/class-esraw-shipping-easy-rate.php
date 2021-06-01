@@ -51,11 +51,22 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 
 	const CONDITION_CHOICES = array(
 		'Cart'                => array(
-			'Subtotal' => 'subtotal',
+			'Subtotal'                => 'subtotal',
+			'Subtotal ex. taxes'      => 'subtotal_ex',
+			'Quantity'                => 'quantity',
+			'Cart line item'          => 'cart_line_item',
+			'Contains shipping class' => 'contains_shipping_class',
 		),
 		'Weight & Dimensions' => array(
 			'Weight' => 'weight',
+			// 'Volume' => 'volume',
 		),
+		// 'User Details'        => array(
+		// 'Zipcode'   => 'zipcode',
+		// 'City'      => 'city',
+		// 'Country'   => 'country',
+		// 'User role' => 'role',
+		// ),
 	);
 	const Operator = array(
 		'is'     => 'is',
@@ -97,13 +108,13 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 		$this->method_title       = __( 'Easy Shipping', 'esraw-woo' );
 		$this->method_description = __( 'Easy way to define your shipping method', 'esraw-woo' );
 		$this->enabled            = isset( $this->settings['enabled'] ) ? $this->settings['enabled'] : 'yes';
-		$this->title              = $this->get_instance_option( self::METHOD_TITLE, $this->method_title );
+		$this->title              = $this->get_option( self::METHOD_TITLE, $this->method_title );
 		$this->min_amount         = $this->get_option( self::METHOD_FREE_MIN_AMOUNT, 0 );
 		$this->postcode_need      = $this->get_option( self::METHOD_FREE_USER_POSTCODE, null );
 		$this->requires           = $this->get_option( self::METHOD_FREE_REQUIRES );
 		$this->ignore_discounts   = $this->get_option( self::METHOD_FREE_IGN_DISC );
 
-		$this->tax_status = $this->get_instance_option( self::METHOD_TAXABLE );
+		$this->tax_status = $this->get_option( self::METHOD_TAXABLE );
 
 		$this->conditions_key        = 'easy_rate';
 		$this->conditions_option_key = $this->id . $this->instance_id;
@@ -202,7 +213,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
-			self::METHOD_FREE_USER_POSTCODE     => array(
+			self::METHOD_FREE_USER_POSTCODE  => array(
 				'title'       => __( 'User Postcode', 'esraw-woo' ),
 				'type'        => 'text',
 				'placeholder' => 'postcode1,postcode2,etc',
@@ -336,12 +347,24 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 														</option>
 													<?php endforeach; ?>
 												</select>
-												<input type="number"  step="0.01" value="<?php esc_attr_e( $condition['operand1'] ); ?>" placeholder="from" name="easy_rate[<?php esc_attr_e( $key ); ?>][operand1]"/>
-												<input type="number" step="0.01" value="<?php esc_attr_e( $condition['operand2'] ); ?>" placeholder="to" name="easy_rate[<?php esc_attr_e( $key ); ?>][operand2]"/>
+												<?php if ( 'contains_shipping_class' === $condition['condition'] ) : ?>
+													<select multiple="" style="overflow: scroll;height: 35px;" name="easy_rate[2][choices][]" required="">
+														<?php foreach ( self::ship_classes_select_field() as $choice_key => $choice_class_value ) : ?>
+															<option value="<?php esc_attr_e( $choice_key ); ?>" <?php in_array( $choice_key, $condition['choices'], true ) ? esc_attr_e( 'selected' ) : ''; ?>>
+																<?php esc_attr_e( $choice_class_value ); ?>
+															</option>
+														<?php endforeach; ?>
+													</select>
+												<?php else : ?>
+													<input type="number"  step="0.01" value="<?php esc_attr_e( $condition['operand1'] ); ?>" placeholder="from" name="easy_rate[<?php esc_attr_e( $key ); ?>][operand1]"/>
+													<input type="number" step="0.01" value="<?php esc_attr_e( $condition['operand2'] ); ?>" placeholder="to" name="easy_rate[<?php esc_attr_e( $key ); ?>][operand2]"/>
+												<?php endif; ?>
 												<?php
 													$unit = '';
-												if ( 'subtotal' === $condition['condition'] ) {
+												if ( 'subtotal' === $condition['condition'] || 'subtotal_ex' === $condition['condition'] ) {
 													$unit = get_woocommerce_currency_symbol();
+												} elseif ( 'quantity' === $condition['condition'] || 'cart_line_item' === $condition['condition'] ) {
+													$unit = 'qty';
 												} elseif ( 'weight' === $condition['condition'] || 'dimension' === $condition['condition'] ) {
 													$unit = 'kg';
 												}
@@ -363,6 +386,34 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 		<?php
 	}
 
+	public static function ship_classes_select_field() {
+		$shipping_classes     = WC()->shipping()->get_shipping_classes();
+		$ship_classes_options = array();
+		foreach ( $shipping_classes as $shipping_class ) {
+			$ship_classes_options[ $shipping_class->slug ] = $shipping_class->name;
+		}
+		return $ship_classes_options;
+	}
+
+	/**
+	 * Finds and returns shipping classes in cart
+	 *
+	 * @param mixed $package Package of items from cart.
+	 * @return array
+	 */
+	public function find_shipping_classes( $package ) {
+		$found_shipping_classes = array();
+
+		foreach ( $package['contents'] as $values ) {
+			if ( $values['data']->needs_shipping() ) {
+				$found_class              = $values['data']->get_shipping_class();
+				$found_shipping_classes[] = $found_class;
+			}
+		}
+
+		return $found_shipping_classes;
+	}
+
 	/**
 	 * Calculate_shipping function.
 	 *
@@ -382,16 +433,35 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			$cost           = $this->get_instance_option( self::METHOD_MINIMUM_COST, 0 );
 			$conditions_ops = $this->conditions_options;
 			foreach ( $conditions_ops as $condition_row => $condition ) {
+				$array_compa    = false;
+				$value_to_check = null;
 				if ( 'subtotal' === $condition['condition'] ) {
 					$value_to_check = $package['cart_subtotal'];
+				} elseif ( 'subtotal_ex' === $condition['condition'] ) {
+					$value_to_check = WC()->cart->get_subtotal();
+				} elseif ( 'quantity' === $condition['condition'] ) {
+					$value_to_check = WC()->cart->get_cart_contents_count();
+				} elseif ( 'cart_line_item' === $condition['condition'] ) {
+					$value_to_check = count( WC()->cart->get_cart() );
 				} elseif ( 'weight' === $condition['condition'] ) {
 					$value_to_check = WC()->cart->get_cart_contents_weight();
 				}
 
 				$can_get_cost = false;
-				if ( ( $condition['operand1'] <= $value_to_check || '' === $condition['operand1'] ) && ( $condition['operand2'] >= $value_to_check || '' === $condition['operand2'] ) ) {
-					$can_get_cost = true;
+				if ( 'contains_shipping_class' === $condition['condition'] ) {
+					$find_ship_class = $this->find_shipping_classes( $package );
+					$array_compa     = true;
+					if ( array_intersect( $find_ship_class, $condition['choices'] ) ) {
+						$can_get_cost = true;
+					}
 				}
+
+				if ( ! $array_compa ) {
+					if ( ( $condition['operand1'] <= $value_to_check || '' === $condition['operand1'] ) && ( $condition['operand2'] >= $value_to_check || '' === $condition['operand2'] ) ) {
+						$can_get_cost = true;
+					}
+				}
+
 				if ( 'is_not' === $condition['operator'] ) {
 					$can_get_cost = ! $can_get_cost;
 				}

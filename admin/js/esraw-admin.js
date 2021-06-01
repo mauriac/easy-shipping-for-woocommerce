@@ -80,27 +80,43 @@
 			let content = '';
 			let unit = '';
 
-			if (val == 'subtotal') {
+			if (val == 'subtotal' || 'subtotal_ex' == val) {
 				unit = esr_vars.esraw_currency_symbol;
-
+			} else if ('quantity' == val || 'cart_line_item' == val) {
+				unit = 'qty';
 			} else if ('weight' == val || 'dimension' == val) {
 				unit = 'kg';
 			}
 
-			if (val == 'subtotal' || 'weight' == val || 'dimension' == val) {
-				let operators = esr_vars.esraw_operator;
-				let select_options = '';
 
-				for (const key in operators) {
-					if (Object.hasOwnProperty.call(operators, key)) {
-						const choices = operators[key];
-						select_options += '<option value="' + key + '">' + choices + '</option>';
+			let operators = esr_vars.esraw_operator;
+			let select_options = '';
+
+			for (const key in operators) {
+				if (Object.hasOwnProperty.call(operators, key)) {
+					const choices = operators[key];
+					select_options += '<option value="' + key + '">' + choices + '</option>';
+				}
+			}
+
+			if ('subtotal' == val || 'weight' == val || 'dimension' == val || 'subtotal_ex' == val || 'quantity' == val || 'cart_line_item' == val) {
+				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
+					'<input type="number"  step="0.01" placeholder="from" name="easy_rate[' + p + '][operand1]"/>' +
+					'<input type="number" step="0.01" placeholder="to" name="easy_rate[' + p + '][operand2]"/><div class="easy_rate_unit">' + unit + '</div>';
+			} else if ('contains_shipping_class' == val) {
+
+				let ship_classes = esr_vars.esraw_ship_classes_array;
+				let ship_options = '';
+
+				for (const key_ship in ship_classes) {
+					if (Object.hasOwnProperty.call(ship_classes, key_ship)) {
+						const choices = ship_classes[key_ship];
+						ship_options += '<option value="' + key_ship + '">' + choices + '</option>';
 					}
 				}
 
 				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
-					'<input type="number"  step="0.01" placeholder="from" name="easy_rate[' + p + '][operand1]"/>' +
-					'<input type="number" step="0.01" placeholder="to" name="easy_rate[' + p + '][operand2]"/><div class="easy_rate_unit">' + unit + '</div>';
+					'<select multiple style="overflow: scroll; height: 35px;" name="easy_rate[' + p + '][choices][]" required>' + ship_options + '</select>';
 			}
 
 			return content;

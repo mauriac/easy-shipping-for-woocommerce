@@ -99,9 +99,10 @@ class Esraw_Admin {
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/esraw-admin.js', array( 'jquery' ), $this->version, false );
 
 		$data = array(
-			'esraw_condition_choices' => Esraw_Shipping_Easy_Rate::CONDITION_CHOICES,
-			'esraw_operator'          => Esraw_Shipping_Easy_Rate::Operator,
-			'esraw_currency_symbol'   => get_woocommerce_currency_symbol(),
+			'esraw_condition_choices'  => Esraw_Shipping_Easy_Rate::CONDITION_CHOICES,
+			'esraw_operator'           => Esraw_Shipping_Easy_Rate::Operator,
+			'esraw_currency_symbol'    => get_woocommerce_currency_symbol(),
+			'esraw_ship_classes_array' => Esraw_Shipping_Easy_Rate::ship_classes_select_field(),
 		);
 		wp_localize_script( $this->plugin_name, 'esr_vars', $data );
 
