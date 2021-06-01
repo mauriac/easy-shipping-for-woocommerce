@@ -1,7 +1,7 @@
 === Easy Shipping for Woocommerce ===
 Contributors: digitcode0
 Donate link: #
-Tags: shipping, table rate, free shipping, flexible shipping, woocommerce
+Tags: table rate, table rate shipping, conditional shipping, shipping method, woocommerce shipping, flexible shipping, woocommerce table rate shipping, cart based shipping, weight shipping, weight based shipping, totals based shipping, order based shipping, shipping zones, shipping classes, shipping, free shipping, advanced shipping
 Requires at least: 3.0.1
 Tested up to: 5.7
 Requires PHP: 7.0
