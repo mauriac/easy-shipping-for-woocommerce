@@ -117,6 +117,25 @@
 
 				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
 					'<select multiple style="overflow: scroll; height: 35px;" name="easy_rate[' + p + '][choices][]" required>' + ship_options + '</select>';
+			} else if ('user_roles' == val) {
+				let user_roles = esr_vars.esraw_user_roles;
+				let options = '';
+
+				for (const key_ship in user_roles) {
+					if (Object.hasOwnProperty.call(user_roles, key_ship)) {
+						const choices = user_roles[key_ship];
+						options += '<option value="' + key_ship + '">' + choices + '</option>';
+					}
+				}
+
+				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
+					'<select multiple style="overflow: scroll; height: 35px;" name="easy_rate[' + p + '][choices][]" required>' + options + '</select>';
+			} else if ('zipcode' == val) {
+				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
+					'<input type="text" placeholder="postcode1,postcode2,etc." name="easy_rate[' + p + '][choices]"/>';
+			} else if ('city' == val) {
+				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
+					'<input type="text" placeholder="city1,city2,etc." name="easy_rate[' + p + '][choices]"/>';
 			}
 
 			return content;

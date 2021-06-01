@@ -61,12 +61,12 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			'Weight' => 'weight',
 			// 'Volume' => 'volume',
 		),
-		// 'User Details'        => array(
-		// 'Zipcode'   => 'zipcode',
-		// 'City'      => 'city',
-		// 'Country'   => 'country',
-		// 'User role' => 'role',
-		// ),
+		'User Details'        => array(
+			'Zipcode'   => 'zipcode',
+			'City'      => 'city',
+			// 'Country'   => 'country',
+			'User role' => 'user_roles',
+		),
 	);
 	const Operator = array(
 		'is'     => 'is',
@@ -348,13 +348,25 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 													<?php endforeach; ?>
 												</select>
 												<?php if ( 'contains_shipping_class' === $condition['condition'] ) : ?>
-													<select multiple="" style="overflow: scroll;height: 35px;" name="easy_rate[2][choices][]" required="">
+													<select multiple="" style="overflow: scroll;height: 35px;" name="easy_rate[<?php esc_attr_e( $key ); ?>][choices][]" required="">
 														<?php foreach ( self::ship_classes_select_field() as $choice_key => $choice_class_value ) : ?>
 															<option value="<?php esc_attr_e( $choice_key ); ?>" <?php in_array( $choice_key, $condition['choices'], true ) ? esc_attr_e( 'selected' ) : ''; ?>>
 																<?php esc_attr_e( $choice_class_value ); ?>
 															</option>
 														<?php endforeach; ?>
 													</select>
+												<?php elseif ( 'user_roles' === $condition['condition'] ) : ?>
+													<select multiple="" style="overflow: scroll;height: 35px;" name="easy_rate[<?php esc_attr_e( $key ); ?>][choices][]" required="">
+														<?php foreach ( esraw_get_user_roles() as $choice_role_key => $choice_role_name ) : ?>
+															<option value="<?php esc_attr_e( $choice_role_key ); ?>" <?php in_array( $choice_role_key, $condition['choices'], true ) ? esc_attr_e( 'selected' ) : ''; ?>>
+																<?php esc_attr_e( $choice_role_name ); ?>
+															</option>
+														<?php endforeach; ?>
+													</select>
+												<?php elseif ( 'zipcode' === $condition['condition'] ) : ?>
+													<input type="text" placeholder="postcode1,postcode2,etc." name="easy_rate[<?php esc_attr_e( $key ); ?>][choices]" value="<?php esc_attr_e( $condition['choices'] ); ?>"/>
+												<?php elseif ( 'city' === $condition['condition'] ) : ?>
+													<input type="text" placeholder="city1,city2,etc." name="easy_rate[<?php esc_attr_e( $key ); ?>][choices]" value="<?php esc_attr_e( $condition['choices'] ); ?>"/>
 												<?php else : ?>
 													<input type="number"  step="0.01" value="<?php esc_attr_e( $condition['operand1'] ); ?>" placeholder="from" name="easy_rate[<?php esc_attr_e( $key ); ?>][operand1]"/>
 													<input type="number" step="0.01" value="<?php esc_attr_e( $condition['operand2'] ); ?>" placeholder="to" name="easy_rate[<?php esc_attr_e( $key ); ?>][operand2]"/>
@@ -452,6 +464,40 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 					$find_ship_class = $this->find_shipping_classes( $package );
 					$array_compa     = true;
 					if ( array_intersect( $find_ship_class, $condition['choices'] ) ) {
+						$can_get_cost = true;
+					}
+				} elseif ( 'user_roles' === $condition['condition'] ) {
+					if ( is_user_logged_in() ) {
+						$user         = wp_get_current_user();
+						$current_role = (array) $user->roles;
+					} else {
+						$current_role = 'not_login';
+					}
+
+					$array_compa = true;
+					if ( array_intersect( $current_role, $condition['choices'] ) ) {
+						$can_get_cost = true;
+					}
+				} elseif ( 'zipcode' === $condition['condition'] ) {
+					$customer_post_code = WC()->customer->get_shipping_postcode();
+					$p_code_slice       = explode( ',', $condition['choices'] );
+
+					$array_compa = true;
+					if ( in_array( $customer_post_code, $p_code_slice, true ) ) {
+						$can_get_cost = true;
+					}
+				} elseif ( 'city' === $condition['condition'] ) {
+					$customer_city      = WC()->customer->get_shipping_city();
+					$p_city_slice       = explode( ',', $condition['choices'] );
+					$p_city_slice_lower = array_map(
+						function( $p ) {
+							return strtolower( $p );
+						},
+						$p_city_slice
+					);
+
+					$array_compa = true;
+					if ( in_array( strtolower( $customer_city ), $p_city_slice_lower, true ) ) {
 						$can_get_cost = true;
 					}
 				}
