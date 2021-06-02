@@ -20,6 +20,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	const METHOD_MINIMUM_COST        = 'method_minimum_cost';
 	const METHOD_MAXIMUM_COST        = 'method_maximum_cost';
 	const METHOD_RULE_CALCULATION    = 'method_rule_calculation';
+	const METHOD_DIM_FACTOR          = 'method_dim_factor';
 
 	/**
 	 * Min amount to be valid.
@@ -58,8 +59,11 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			'Contains shipping class' => 'contains_shipping_class',
 		),
 		'Weight & Dimensions' => array(
-			'Weight' => 'weight',
-			// 'Volume' => 'volume',
+			'Weight'             => 'weight',
+			'Volume'             => 'volume',
+			'Dimensional weight' => 'dim_weight',
+			// 'Max dimension' => 'max_dim',
+			// 'Total overall dimensions' => 'total_dim',
 		),
 		'User Details'        => array(
 			'Zipcode'   => 'zipcode',
@@ -265,6 +269,18 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'description' => __( 'Select how rules will be calculated.', 'esraw-woo' ),
 				'desc_tip'    => true,
 			),
+			self::METHOD_DIM_FACTOR          => array(
+				'title'       => __( 'DIM Factor', 'esraw-woo' ),
+				'type'        => 'number',
+				'default'     => null,
+				'description' => __(
+					'Filling in the DIM Factor value in this field is required if ' .
+					'you use the When: Dimensional weight condition to calculate the shipping cost. ' .
+					'What\'s more, all the products in your shop should have their dimensions entered.',
+					'esraw-woo'
+				),
+				'desc_tip'    => true,
+			),
 		);
 
 		$this->instance_form_fields = $settings;
@@ -377,8 +393,12 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 													$unit = get_woocommerce_currency_symbol();
 												} elseif ( 'quantity' === $condition['condition'] || 'cart_line_item' === $condition['condition'] ) {
 													$unit = 'qty';
-												} elseif ( 'weight' === $condition['condition'] || 'dimension' === $condition['condition'] ) {
+												} elseif ( 'weight' === $condition['condition'] || 'dim_weight' === $condition['condition'] ) {
 													$unit = 'kg';
+												} elseif ( 'volume' === $condition['condition'] ) {
+													$unit = 'cm<sup>3</sup>';
+												} elseif ( 'max_dim' === $condition['condition'] || 'total_dim' === $condition['condition'] ) {
+													$unit = 'cm';
 												}
 												?>
 												<div class="easy_rate_unit"><?php echo esc_attr( $unit ); ?> </div>
@@ -457,7 +477,20 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 					$value_to_check = count( WC()->cart->get_cart() );
 				} elseif ( 'weight' === $condition['condition'] ) {
 					$value_to_check = WC()->cart->get_cart_contents_weight();
+				} elseif ( 'volume' === $condition['condition'] ) {
+					$value_to_check = esraw_get_cart_volume();
+				} elseif ( 'dim_weight' === $condition['condition'] ) {
+					$cart_vol = esraw_get_cart_volume();
+					$dim_fact = $this->get_option( self::METHOD_DIM_FACTOR );
+					if ( $dim_fact ) {
+						$value_to_check = $cart_vol / $dim_fact;
+					}
 				}
+				// elseif ( 'max_dim' === $condition['condition'] ) {
+				// $value_to_check = WC()->cart->get_cart_contents_weight();
+				// } elseif ( 'total_dim' === $condition['condition'] ) {
+				// $value_to_check = WC()->cart->get_cart_contents_weight();
+				// }
 
 				$can_get_cost = false;
 				if ( 'contains_shipping_class' === $condition['condition'] ) {

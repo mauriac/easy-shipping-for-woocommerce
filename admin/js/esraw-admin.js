@@ -84,8 +84,12 @@
 				unit = esr_vars.esraw_currency_symbol;
 			} else if ('quantity' == val || 'cart_line_item' == val) {
 				unit = 'qty';
-			} else if ('weight' == val || 'dimension' == val) {
+			} else if ('weight' == val || 'dim_weight' == val) {
 				unit = 'kg';
+			} else if ('volume' == val) {
+				unit = 'cm<sup>3</sup>';
+			} else if ('max_dim' == val || 'total_dim' == val) {
+				unit = 'cm';
 			}
 
 
@@ -99,7 +103,7 @@
 				}
 			}
 
-			if ('subtotal' == val || 'weight' == val || 'dimension' == val || 'subtotal_ex' == val || 'quantity' == val || 'cart_line_item' == val) {
+			if ('subtotal' == val || 'weight' == val || 'dim_weight' == val || 'volume' == val || 'max_dim' == val || 'total_dim' == val || 'subtotal_ex' == val || 'quantity' == val || 'cart_line_item' == val) {
 				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
 					'<input type="number"  step="0.01" placeholder="from" name="easy_rate[' + p + '][operand1]"/>' +
 					'<input type="number" step="0.01" placeholder="to" name="easy_rate[' + p + '][operand2]"/><div class="easy_rate_unit">' + unit + '</div>';
