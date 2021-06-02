@@ -17,10 +17,12 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	const METHOD_FREE_USER_POSTCODE  = 'method_free_user_postcode';
 	const METHOD_FREE_SHIPPING_LABEL = 'method_free_shipping_label';
 	const METHOD_VISIBILITY          = 'method_visibility';
+	const METHOD_DEFAULT             = 'method_DEFAULT';
 	const METHOD_MINIMUM_COST        = 'method_minimum_cost';
 	const METHOD_MAXIMUM_COST        = 'method_maximum_cost';
 	const METHOD_RULE_CALCULATION    = 'method_rule_calculation';
 	const METHOD_DIM_FACTOR          = 'method_dim_factor';
+	const METHOD_ID                  = 'esraw';
 
 	/**
 	 * Min amount to be valid.
@@ -106,7 +108,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			'settings',
 		);
 
-		$this->id = 'esraw';
+		$this->id = self::METHOD_ID;
 		$this->init();
 
 		$this->method_title       = __( 'Easy Shipping', 'esraw-woo' );
@@ -237,11 +239,20 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'type'  => 'title',
 			),
 			self::METHOD_VISIBILITY          => array(
-				'title'       => __( 'Visibility', 'esraw-woo' ),
-				'type'        => 'checkbox',
-				'default'     => 'no',
-				'label'       => ' ',
-				'description' => __( 'Show only for logged in users.', 'esraw-woo' ),
+				'title'   => __( 'Visibility', 'esraw-woo' ),
+				'type'    => 'checkbox',
+				'default' => 'no',
+				'label'   => 'Show only for logged in users.',
+				// 'description' => __( 'Show only for logged in users.', 'esraw-woo' ),
+				// 'desc_tip' => true,
+			),
+			self::METHOD_DEFAULT             => array(
+				'title'   => __( 'Default', 'esraw-woo' ),
+				'type'    => 'checkbox',
+				'default' => 'no',
+				'label'   => 'Set this Method as the default selected choice on the cart page.',
+				// 'description' => __( 'Set this option as the default selected choice on the cart page.', 'esraw-woo' ),
+				// 'desc_tip' => true,
 			),
 			self::METHOD_MINIMUM_COST        => array(
 				'title'       => __( 'Shipping minimum cost', 'esraw-woo' ),

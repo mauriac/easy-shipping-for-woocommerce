@@ -159,6 +159,7 @@ class Esraw {
 
 		$this->loader->add_action( 'woocommerce_shipping_init', $plugin_admin, 'init_shipping_method' );
 		$this->loader->add_filter( 'woocommerce_shipping_methods', $plugin_admin, 'add_easy_rate_shipping_method' );
+		$this->loader->add_filter( 'woocommerce_shipping_chosen_method', $plugin_admin, 'set_default_shipping_method', 99, 2 );
 	}
 
 	/**

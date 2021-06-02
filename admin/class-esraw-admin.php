@@ -120,4 +120,16 @@ class Esraw_Admin {
 		$methods['esrw'] = 'Esraw_Shipping_Easy_Rate';
 		return $methods;
 	}
+
+	public function set_default_shipping_method( $method, $available_methods ) {
+		foreach ( $available_methods as $method_key => $pack_method ) {
+			if ( $pack_method->get_method_id() === Esraw_Shipping_Easy_Rate::METHOD_ID ) {
+				$esraw_meth = new Esraw_Shipping_Easy_Rate( $pack_method->get_instance_id() );
+				if ( 'yes' === $esraw_meth->get_option( Esraw_Shipping_Easy_Rate::METHOD_DEFAULT, 'no' ) ) {
+					return $method_key;
+				}
+			}
+		}
+		return $method;
+	}
 }
