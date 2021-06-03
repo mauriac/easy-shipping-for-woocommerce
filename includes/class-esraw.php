@@ -174,6 +174,7 @@ class Esraw {
 		$plugin_public = new Esraw_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'woocommerce_after_shipping_rate', $plugin_public, 'display_shipping_description_on_cart', 10, 2 );
+		$this->loader->add_filter( 'woocommerce_package_rates', $plugin_public, 'hide_shipping_when_free_is_available', 10, 2 );
 
 	}
 

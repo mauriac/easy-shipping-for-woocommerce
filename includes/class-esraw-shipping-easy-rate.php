@@ -23,6 +23,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	const METHOD_RULE_CALCULATION    = 'method_rule_calculation';
 	const METHOD_DIM_FACTOR          = 'method_dim_factor';
 	const METHOD_ID                  = 'esraw';
+	const CONFIG_HIDE_ALL            = 'config_hide_method';
 
 	/**
 	 * Min amount to be valid.
@@ -50,7 +51,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	 *
 	 * @var string
 	 */
-	private $is_free_shipping;
+	public $is_free_shipping;
 
 	const CONDITION_CHOICES = array(
 		'Cart'                => array(
@@ -295,7 +296,25 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 		);
 
 		$this->instance_form_fields = $settings;
-		$this->form_fields          = array(); // No global options for table rates
+
+		$form_sets         = array(
+			'config_general'      => array(
+				'title' => __( 'General Settings', 'esraw-woo' ),
+				'type'  => 'title',
+			),
+			self::CONFIG_HIDE_ALL => array(
+				'title'       => __( 'Hide method', 'esraw-woo' ),
+				'type'        => 'select',
+				'default'     => '',
+				'options'     => array(
+					''         => __( 'N/A', 'esraw-woo' ),
+					'hide_all' => __( 'Show only "Free Shipping"', 'esraw-woo' ),
+				),
+				'description' => __( 'this option not only includes the methods of this plugin but also the free shipping of woocommerce', 'esraw-woo' ),
+				'desc_tip'    => true,
+			),
+		);
+		$this->form_fields = $form_sets;
 	}
 
 	/**
@@ -317,7 +336,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	 */
 	public function instance_options() {
 			$this->generate_settings_html( $this->get_instance_form_fields() );
-			?>
+		?>
 			<tr>
 				<td>
 				<h2><?php esc_attr_e( 'Rules for calculating shipping costs', 'esr-woo' ); ?></h2>
