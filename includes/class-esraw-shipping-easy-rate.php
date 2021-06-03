@@ -304,18 +304,18 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	 * @return string
 	 */
 	public function get_admin_options_html() {
-		ob_start();
-		$this->instance_options();
-		return ob_get_clean();
+		if ( $this->instance_id ) {
+			$settings_html = $this->instance_options();
+		} else {
+			$settings_html = $this->generate_settings_html( $this->get_form_fields(), false );
+		}
+		return '<table class="form-table">' . $settings_html . '</table>';
 	}
 
 	/**
 	 * admin_options function.
 	 */
 	public function instance_options() {
-		?>
-		<table class="form-table">
-			<?php
 			$this->generate_settings_html( $this->get_instance_form_fields() );
 			?>
 			<tr>
@@ -412,7 +412,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 													$unit = 'cm';
 												}
 												?>
-												<div class="easy_rate_unit"><?php echo esc_attr( $unit ); ?> </div>
+												<div class="easy_rate_unit"><?php echo $unit; ?> </div>
 											</span>
 										</div>
 									</td>
@@ -425,7 +425,6 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 					</table>
 				</td>
 			</tr>
-		</table>
 		<?php
 	}
 
