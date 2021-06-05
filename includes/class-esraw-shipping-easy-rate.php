@@ -276,7 +276,9 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'type'        => 'select',
 				'default'     => 'sum',
 				'options'     => array(
-					'sum' => __( 'Sum', 'esraw-woo' ),
+					'sum'     => __( 'Sum', 'esraw-woo' ),
+					'lowest'  => __( 'Lowest cost', 'esraw-woo' ),
+					'highest' => __( 'Highest cost', 'esraw-woo' ),
 				),
 				'description' => __( 'Select how rules will be calculated.', 'esraw-woo' ),
 				'desc_tip'    => true,
@@ -493,7 +495,13 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 		} else {
 			$cost           = $this->get_instance_option( self::METHOD_MINIMUM_COST, 0 );
 			$conditions_ops = $this->conditions_options;
+			$temp_cost      = 0;
+			$iteration      = 0;
 			foreach ( $conditions_ops as $condition_row => $condition ) {
+				if ( 0 === $iteration ) {
+					$temp_cost = $condition['cost'];
+					$iteration++;
+				}
 				$array_compa    = false;
 				$value_to_check = null;
 				if ( 'subtotal' === $condition['condition'] ) {
@@ -577,10 +585,15 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				if ( $can_get_cost ) {
 					$cost_calculation = $this->get_instance_option( self::METHOD_RULE_CALCULATION, 'sum' );
 					if ( 'sum' === $cost_calculation ) {
-						$cost += $condition['cost'];
+						$temp_cost += $condition['cost'];
+					} elseif ( 'lowest' === $cost_calculation && $condition['cost'] < $temp_cost ) {
+						$temp_cost = $condition['cost'];
+					} elseif ( 'highest' === $cost_calculation && $condition['cost'] > $temp_cost ) {
+						$temp_cost = $condition['cost'];
 					}
 				}
 			}
+			$cost += $temp_cost;
 		}
 		$max_cost = $this->get_instance_option( self::METHOD_MAXIMUM_COST, 0 );
 		if ( ! empty( $max_cost ) && $cost > $max_cost ) {
