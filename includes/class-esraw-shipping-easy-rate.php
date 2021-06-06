@@ -80,6 +80,12 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 		'is'     => 'is',
 		'is_not' => 'is not',
 	);
+	const CONDITIONS_ACTIONS = array(
+		'none'      => 'None',
+		'stop'      => 'Stop',
+		'cancel'    => 'Cancel',
+		'free_ship' => 'Free Shipping',
+	);
 
 	/**
 	 *
@@ -363,6 +369,9 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 								<th>
 									<?php esc_attr_e( 'Cost', 'esr-woo' ); ?>
 								</th>
+								<th>
+									<?php esc_attr_e( 'Actions', 'esr-woo' ); ?>
+								</th>
 							</tr>
 						</thead>
 						<tfoot>
@@ -447,6 +456,15 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 									</td>
 									<td>
 										<input type="number"  step="0.01" value="<?php esc_attr_e( $condition['cost'] ); ?>" name="easy_rate[<?php esc_attr_e( $key ); ?>][cost]" required/>
+									</td>
+									<td>
+										<select id="easy_rate_action_<?php esc_attr_e( $key ); ?>" name="easy_rate[<?php esc_attr_e( $key ); ?>][action]">
+											<?php foreach ( self::CONDITIONS_ACTIONS as $ac_key => $action ) : ?>
+												<option value="<?php esc_attr_e( $ac_key ); ?>" <?php ( isset( $condition['action'] ) && $ac_key === $condition['action'] ) ? esc_attr_e( 'selected' ) : ''; ?>>
+													<?php esc_attr_e( $action ); ?>
+												</option>
+											<?php endforeach; ?>
+										</select>
 									</td>
 								</tr>
 							<?php endforeach; ?>
@@ -598,6 +616,18 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 						$temp_cost = $condition['cost'];
 					} elseif ( 'highest' === $cost_calculation && $condition['cost'] > $temp_cost ) {
 						$temp_cost = $condition['cost'];
+					}
+				}
+
+				if ( isset( $condition['action'] ) ) {
+					if ( 'stop' === $condition['action'] ) {
+						break;
+					} elseif ( 'cancel' === $condition['action'] ) {
+						return null;
+					} elseif ( 'free_ship' === $condition['action'] ) {
+						$cost      = 0;
+						$temp_cost = 0;
+						$label     = $this->get_instance_option( self::METHOD_FREE_SHIPPING_LABEL, $this->title );
 					}
 				}
 			}
