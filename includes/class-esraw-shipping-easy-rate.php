@@ -20,6 +20,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	const METHOD_DEFAULT             = 'method_DEFAULT';
 	const METHOD_MINIMUM_COST        = 'method_minimum_cost';
 	const METHOD_MAXIMUM_COST        = 'method_maximum_cost';
+	const METHOD_ESTIMATED_DELIVERY  = 'method_estimated_delivery';
 	const METHOD_RULE_CALCULATION    = 'method_rule_calculation';
 	const METHOD_DIM_FACTOR          = 'method_dim_factor';
 	const METHOD_ID                  = 'esraw';
@@ -269,6 +270,13 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'label'       => ' ',
 				'default'     => null,
 				'description' => __( 'Enter the maximum price for this shipment.', 'esraw-woo' ),
+				'desc_tip'    => true,
+			),
+			self::METHOD_ESTIMATED_DELIVERY  => array(
+				'title'       => __( 'Estimated days for delivery', 'esraw-woo' ),
+				'type'        => 'number',
+				'default'     => '',
+				'description' => __( 'Estimated days for delivery. If filled, user will be notified of its delivery date.', 'esraw-woo' ),
 				'desc_tip'    => true,
 			),
 			self::METHOD_RULE_CALCULATION    => array(

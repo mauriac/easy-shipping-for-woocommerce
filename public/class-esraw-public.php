@@ -57,14 +57,28 @@ class Esraw_Public {
 	public function display_shipping_description_on_cart( $method, $index ) {
 		$easy_shipping        = new Esraw_Shipping_Easy_Rate( $method->get_instance_id() );
 		$description_for_user = $easy_shipping->get_instance_option( Esraw_Shipping_Easy_Rate::METHOD_DESCRIPTION, '' );
+		$delivery_days        = $easy_shipping->get_option( Esraw_Shipping_Easy_Rate::METHOD_ESTIMATED_DELIVERY, '' );
+
 		if ( $description_for_user ) {
 			?>
 				<small><p class="shipping-method-description"><?php echo $description_for_user; ?></p></small>
 			<?php
 		}
+		if ( $delivery_days ) {
+			$estimated_date = wp_date( 'l, d F Y', strtotime( '+' . $delivery_days . ' day' ) );
+			if ( $estimated_date ) {
+				?>
+					<div>
+						<small>
+							<strong><?php esc_html_e( 'Estimated Delivery Date', 'esraw-woo' ); ?>:</strong> <?php esc_attr_e( $estimated_date ); ?>
+						</small>
+					</div>
+				<?php
+			}
+		}
 	}
 
-	public function hide_shipping_when_free_is_available( $rates, $package  ) {
+	public function hide_shipping_when_free_is_available( $rates, $package ) {
 		$esraw_meth_general = new Esraw_Shipping_Easy_Rate( 0 );
 		if ( 'hide_all' !== $esraw_meth_general->get_option( Esraw_Shipping_Easy_Rate::CONFIG_HIDE_ALL ) ) {
 			return $rates;
