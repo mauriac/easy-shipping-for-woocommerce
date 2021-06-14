@@ -117,7 +117,7 @@ class Esraw_Admin {
 	}
 
 	public function add_easy_rate_shipping_method( $methods ) {
-		$methods['esrw'] = 'Esraw_Shipping_Easy_Rate';
+		$methods[ Esraw_Shipping_Easy_Rate::METHOD_ID ] = 'Esraw_Shipping_Easy_Rate';
 		return $methods;
 	}
 }
