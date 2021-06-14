@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       Easy Shipping Rate for Woocommerce
  * Plugin URI:        #
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Description:       Easy Shipping for Woocommerce allows you to easily create new shipping methods. It is a very flexible plugin with which you can condition the pricing of your shipping methods.
  * Version:           1.0.4
  * Author:            DigitCode
  * Author URI:        #
