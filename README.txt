@@ -32,6 +32,8 @@ Easy Shipping for Woocommerce is easy, and flexible shipping plugin for WooComme
 <li>Conditional Shipping Cost</li>
 <li>Shipping cost based on cart total and/or weight</li>
 <li>Hide shipping method if user is not logged</li>
+<li>Hide all orthers method when free shipping is available</li>
+<li>More and more</li>
 </ul>
 
 == Screenshots ==
