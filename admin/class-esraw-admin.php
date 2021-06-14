@@ -101,6 +101,7 @@ class Esraw_Admin {
 		$data = array(
 			'esraw_condition_choices'  => Esraw_Shipping_Easy_Rate::CONDITION_CHOICES,
 			'esraw_operator'           => Esraw_Shipping_Easy_Rate::Operator,
+			'esraw_condition_actions'  => Esraw_Shipping_Easy_Rate::CONDITIONS_ACTIONS,
 			'esraw_currency_symbol'    => get_woocommerce_currency_symbol(),
 			'esraw_ship_classes_array' => Esraw_Shipping_Easy_Rate::ship_classes_select_field(),
 			'esraw_user_roles'         => esraw_get_user_roles(),

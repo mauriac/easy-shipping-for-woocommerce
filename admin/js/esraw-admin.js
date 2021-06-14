@@ -53,11 +53,26 @@
 
 		function create_content(p) {
 			let cond_choices = esr_vars.esraw_condition_choices;
+			let cond_actions = esr_vars.esraw_condition_actions;
+
+			let cond_choices_options = generate_select_option_for_group(cond_choices); // get condition options.
+			let cond_actions_options = generate_select_option(cond_actions); // get action options.
+
+			let content = '<tr data-key="' + p + '"><td><input type="checkbox" class="esr_remove_tr"></td>' +
+				'<td><div class="easy_rate_condition_content" id="easy_rate_condition_content_' + p + '"><select id="easy_rate_condition_' + p +
+				'" name="easy_rate[' + p + '][condition]" required>' + cond_choices_options + '</select>' +
+				'<span class="easy_rate_operator_content" id="easy_rate_operator_content_' + p + '"></span></div></td>' +
+				'<td><input type="number"  step="0.01" name="easy_rate[' + p + '][cost]" required/></td>' +
+				'<td><select id="easy_rate_action_' + p + '" name="easy_rate[' + p + '][action]">' + cond_actions_options + '</select></td></tr>';
+			return content;
+		}
+
+		function generate_select_option_for_group(select_choices) {
 			let select_options = '<option></option>';
 
-			for (const key in cond_choices) {
-				if (Object.hasOwnProperty.call(cond_choices, key)) {
-					const choices = cond_choices[key];
+			for (const key in select_choices) {
+				if (Object.hasOwnProperty.call(select_choices, key)) {
+					const choices = select_choices[key];
 					select_options += '<optgroup label="' + key + '">';
 					for (const choices_key in choices) {
 						if (Object.hasOwnProperty.call(choices, choices_key)) {
@@ -69,11 +84,18 @@
 					select_options += '</optgroup>';
 				}
 			}
-			let content = '<tr data-key="' + p + '"><td><input type="checkbox" class="esr_remove_tr"></td>' +
-				'<td><div class="easy_rate_condition_content" id="easy_rate_condition_content_' + p + '"><select id="easy_rate_condition_' + p + '" name="easy_rate[' + p + '][condition]" required>' + select_options + '</select>' +
-				'<span class="easy_rate_operator_content" id="easy_rate_operator_content_' + p + '"></span></div></td>' +
-				'<td><input type="number"  step="0.01" name="easy_rate[' + p + '][cost]" required/></td></tr>';
-			return content;
+			return select_options;
+		}
+
+		function generate_select_option(select_choices) {
+			let select_options = '';
+			for (const key in select_choices) {
+				if (Object.hasOwnProperty.call(select_choices, key)) {
+					const choices = select_choices[key];
+					select_options += '<option value="' + key + '">' + choices + '</option>';
+				}
+			}
+			return select_options;
 		}
 
 		function create_operators(p, val) {
