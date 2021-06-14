@@ -76,7 +76,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			'User role' => 'user_roles',
 		),
 	);
-	const Operator = array(
+	const Operator           = array(
 		'is'     => 'is',
 		'is_not' => 'is not',
 	);
@@ -522,12 +522,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			$cost           = $this->get_instance_option( self::METHOD_MINIMUM_COST, 0 );
 			$conditions_ops = $this->conditions_options;
 			$temp_cost      = 0;
-			$iteration      = 0;
 			foreach ( $conditions_ops as $condition_row => $condition ) {
-				if ( 0 === $iteration ) {
-					$temp_cost = $condition['cost'];
-					$iteration++;
-				}
 				$array_compa    = false;
 				$value_to_check = null;
 				if ( 'subtotal' === $condition['condition'] ) {
