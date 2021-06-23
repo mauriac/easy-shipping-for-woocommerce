@@ -175,6 +175,9 @@ class Esraw {
 		$this->loader->add_action( 'woocommerce_after_shipping_rate', $plugin_public, 'display_shipping_description_on_cart', 10, 2 );
 		$this->loader->add_filter( 'woocommerce_package_rates', $plugin_public, 'hide_shipping_when_free_is_available', 10, 2 );
 		$this->loader->add_filter( 'woocommerce_shipping_chosen_method', $plugin_public, 'set_default_shipping_method', 99, 2 );
+		// Woocommerce - Cart page notification
+		$this->loader->add_action( 'woocommerce_before_cart_table', $plugin_public, 'display_free_shipping_notification' );
+		$this->loader->add_action( 'woocommerce_before_checkout_form', $plugin_public, 'display_free_shipping_notification' );
 
 	}
 

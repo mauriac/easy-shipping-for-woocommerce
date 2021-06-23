@@ -16,6 +16,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	const METHOD_FREE_IGN_DISC       = 'method_free_ignore_discounts';
 	const METHOD_FREE_USER_POSTCODE  = 'method_free_user_postcode';
 	const METHOD_FREE_SHIPPING_LABEL = 'method_free_shipping_label';
+	const METHOD_FREE_NOTIFICATION   = 'method_free_shipping_notification';
 	const METHOD_VISIBILITY          = 'method_visibility';
 	const METHOD_DEFAULT             = 'method_DEFAULT';
 	const METHOD_MINIMUM_COST        = 'method_minimum_cost';
@@ -232,6 +233,13 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'type'        => 'text',
 				'placeholder' => 'postcode1,postcode2,etc',
 				'description' => __( 'Users with this Postal Code will get free shipping (if enabled above). To match several post codes separate them with commas', 'esraw-woo' ),
+				'desc_tip'    => true,
+			),
+			self::METHOD_FREE_NOTIFICATION   => array(
+				'title'       => __( 'Free Shipping Notification', 'esraw-woo' ),
+				'type'        => 'checkbox',
+				'description' => __( 'Let your customer know how much more to pay to get free shipping', 'esraw-woo' ),
+				'default'     => 'no',
 				'desc_tip'    => true,
 			),
 			self::METHOD_FREE_SHIPPING_LABEL => array(
@@ -746,19 +754,23 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 					var minAmountField = $( '#woocommerce_esraw_method_free_min_amount', form ).closest( 'tr' );
 					var ignoreDiscountField = $( '#woocommerce_esraw_method_free_ignore_discounts', form ).closest( 'tr' );
 					var userPostcodeField = $( '#woocommerce_esraw_method_free_user_postcode', form ).closest( 'tr' );
+					var freeNotificationField = $( '#woocommerce_esraw_method_free_shipping_notification', form ).closest( 'tr' );
 					if ( 'coupon' === $( el ).val() || '' === $( el ).val() ) {
 						minAmountField.hide();
 						ignoreDiscountField.hide();
 						userPostcodeField.hide();
+						freeNotificationField.hide();
 					} else {
 						minAmountField.hide();
 						ignoreDiscountField.hide();
 						userPostcodeField.hide();
+						freeNotificationField.hide();
 						if ( 'postcode' === $( el ).val() ) {
 							userPostcodeField.show();
 						} else {
 							minAmountField.show();
 							ignoreDiscountField.show();
+							freeNotificationField.show();
 						}
 					}
 				}

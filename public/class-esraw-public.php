@@ -112,4 +112,24 @@ class Esraw_Public {
 		}
 		return $method;
 	}
+
+	public function display_free_shipping_notification() {
+		$current          = WC()->cart->subtotal;
+		$shipping_methods = WC()->shipping->packages;
+		foreach ( $shipping_methods[0]['rates'] as $id => $shipping_method ) {
+			if ( $shipping_method->get_method_id() === Esraw_Shipping_Easy_Rate::METHOD_ID ) {
+				$esraw_meth     = new Esraw_Shipping_Easy_Rate( $shipping_method->get_instance_id() );
+				$can_show_notif = $esraw_meth->get_option( Esraw_Shipping_Easy_Rate::METHOD_FREE_NOTIFICATION, false );
+				if ( 'yes' === $can_show_notif ) {
+					$min_amount = $esraw_meth->get_option( Esraw_Shipping_Easy_Rate::METHOD_FREE_MIN_AMOUNT, 0 );
+					if ( $current < $min_amount ) {
+						$added_text = '<div class="woocommerce-message">Buy  ' . wc_price( $min_amount - $current ) . ' worth products more to get free shipping<br/>';
+						$return_to  = wc_get_page_permalink( 'shop' );
+						$notice     = sprintf( '%s<a href="%s">%s</a>', $added_text, esc_url( $return_to ), 'Continue shopping</div>' );
+						echo $notice;
+					}
+				}
+			}
+		}
+	}
 }
