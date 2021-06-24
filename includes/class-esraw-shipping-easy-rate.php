@@ -421,7 +421,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 													<?php endforeach; ?>
 												</select>
 												<?php if ( 'contains_shipping_class' === $condition['condition'] ) : ?>
-													<select multiple="" style="overflow: scroll;height: 35px;" name="easy_rate[<?php esc_attr_e( $key ); ?>][choices][]" required="">
+													<select multiple style="overflow: scroll;height: 35px;" name="easy_rate[<?php esc_attr_e( $key ); ?>][choices][]" required="" id="esraw_ship_class">
 														<?php foreach ( self::ship_classes_select_field() as $choice_key => $choice_class_value ) : ?>
 															<option value="<?php esc_attr_e( $choice_key ); ?>" <?php in_array( $choice_key, $condition['choices'], true ) ? esc_attr_e( 'selected' ) : ''; ?>>
 																<?php esc_attr_e( $choice_class_value ); ?>
@@ -429,7 +429,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 														<?php endforeach; ?>
 													</select>
 												<?php elseif ( 'user_roles' === $condition['condition'] ) : ?>
-													<select multiple="" style="overflow: scroll;height: 35px;" name="easy_rate[<?php esc_attr_e( $key ); ?>][choices][]" required="">
+													<select multiple id="esraw_user_roles" style="overflow: scroll;height: 35px;" name="easy_rate[<?php esc_attr_e( $key ); ?>][choices][]" required="">
 														<?php foreach ( esraw_get_user_roles() as $choice_role_key => $choice_role_name ) : ?>
 															<option value="<?php esc_attr_e( $choice_role_key ); ?>" <?php in_array( $choice_role_key, $condition['choices'], true ) ? esc_attr_e( 'selected' ) : ''; ?>>
 																<?php esc_attr_e( $choice_role_name ); ?>
