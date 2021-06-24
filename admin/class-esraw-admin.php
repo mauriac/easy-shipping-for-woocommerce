@@ -74,6 +74,7 @@ class Esraw_Admin {
 		 */
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rsw-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name . 'select2', plugin_dir_url( __FILE__ ) . 'css/select-css/select2.css', array(), $this->version, 'all' );
 
 	}
 
@@ -107,6 +108,8 @@ class Esraw_Admin {
 			'esraw_user_roles'         => esraw_get_user_roles(),
 		);
 		wp_localize_script( $this->plugin_name, 'esr_vars', $data );
+
+		wp_enqueue_script( $this->plugin_name . 'select2', plugin_dir_url( __FILE__ ) . 'js/select-js/select2.full.js', array( 'jquery' ), $this->version, false );
 
 	}
 

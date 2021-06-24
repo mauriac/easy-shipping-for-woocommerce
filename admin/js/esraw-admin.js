@@ -6,6 +6,8 @@
 				let condition_val = $(this).val();
 				let add_for_calcul = create_operators(index, condition_val);
 				$('#easy_rate_operator_content_' + index).html(add_for_calcul);
+				$( '#esraw_ship_class' ).select2({ minimumResultsForSearch: 2 });
+				$( '#esraw_user_roles' ).select2({ minimumResultsForSearch: 2 });
 			});
 		});
 
@@ -48,8 +50,13 @@
 				let condition_val = $(this).val();
 				let add_for_calcul = create_operators(last_tr_key, condition_val);
 				$('#easy_rate_operator_content_' + last_tr_key).html(add_for_calcul);
+				$( '#esraw_ship_class' ).select2({ minimumResultsForSearch: 2 });
+				$( '#esraw_user_roles' ).select2({ minimumResultsForSearch: 2 });
 			});
 		});
+		//select2
+		$( '#esraw_ship_class' ).select2({ minimumResultsForSearch: 2 });
+		$( '#esraw_user_roles' ).select2({ minimumResultsForSearch: 2 });
 
 		function create_content(p) {
 			let cond_choices = esr_vars.esraw_condition_choices;
@@ -142,7 +149,7 @@
 				}
 
 				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
-					'<select multiple style="overflow: scroll; height: 35px;" name="easy_rate[' + p + '][choices][]" required>' + ship_options + '</select>';
+					'<select multiple id="esraw_ship_class" style="overflow: scroll; height: 35px;" name="easy_rate[' + p + '][choices][]" required>' + ship_options + '</select>';
 			} else if ('user_roles' == val) {
 				let user_roles = esr_vars.esraw_user_roles;
 				let options = '';
@@ -155,7 +162,7 @@
 				}
 
 				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
-					'<select multiple style="overflow: scroll; height: 35px;" name="easy_rate[' + p + '][choices][]" required>' + options + '</select>';
+					'<select multiple id="esraw_user_roles" style="overflow: scroll; height: 35px;" name="easy_rate[' + p + '][choices][]" required>' + options + '</select>';
 			} else if ('zipcode' == val) {
 				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
 					'<input type="text" placeholder="postcode1,postcode2,etc." name="easy_rate[' + p + '][choices]"/>';
