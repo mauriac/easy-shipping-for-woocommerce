@@ -10,6 +10,8 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	const METHOD_TITLE               = 'method_title';
 	const METHOD_DESCRIPTION         = 'method_description';
 	const METHOD_TAXABLE             = 'method_taxable';
+	const METHOD_START_DATE          = 'method_start_date';
+	const METHOD_END_DATE            = 'method_end_date';
 	const METHOD_FREE_SHIPPING_COST  = 'method_free_shipping_cost';
 	const METHOD_FREE_REQUIRES       = 'method_free_requires';
 	const METHOD_FREE_MIN_AMOUNT     = 'method_free_min_amount';
@@ -190,6 +192,26 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				),
 				'desc_tip' => __( 'Apply tax or no.', 'esraw-woo' ),
 				'desc_tip' => true,
+			),
+			self::METHOD_START_DATE          => array(
+				'title'       => __( 'Start Date', 'esraw-woo' ),
+				'type'        => 'date',
+				'default'     => null,
+				'description' => __(
+					'When to apply this method.(Optional)',
+					'esraw-woo'
+				),
+				'desc_tip'    => true,
+			),
+			self::METHOD_END_DATE            => array(
+				'title'       => __( 'End Date', 'esraw-woo' ),
+				'type'        => 'date',
+				'default'     => null,
+				'description' => __(
+					'When to stop this method.(Optional)',
+					'esraw-woo'
+				),
+				'desc_tip'    => true,
 			),
 
 			'section_free_shipping'          => array(
@@ -668,6 +690,17 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	 * @return bool
 	 */
 	public function is_available( $package ) {
+		$today_date = gmdate( 'Y-m-d' );
+		$start_date = $this->get_option( self::METHOD_START_DATE, null );
+		if ( $today_date < $start_date ) {
+			return;
+		}
+
+		$end_date = $this->get_option( self::METHOD_END_DATE, null );
+		if ( $end_date < $today_date ) {
+			return;
+		}
+
 		$has_coupon         = false;
 		$has_met_min_amount = false;
 
