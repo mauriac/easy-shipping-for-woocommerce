@@ -692,12 +692,12 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	public function is_available( $package ) {
 		$today_date = gmdate( 'Y-m-d' );
 		$start_date = $this->get_option( self::METHOD_START_DATE, null );
-		if ( $today_date < $start_date ) {
+		if ( $start_date && $today_date < $start_date ) {
 			return;
 		}
 
 		$end_date = $this->get_option( self::METHOD_END_DATE, null );
-		if ( $end_date < $today_date ) {
+		if ( $end_date && $end_date < $today_date ) {
 			return;
 		}
 
