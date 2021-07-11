@@ -61,10 +61,10 @@ register_deactivation_hook( __FILE__, 'deactivate_esraw' );
 
 if ( ! class_exists( 'WooCommerce' ) ) {
 	require plugin_dir_path( __FILE__ ) . '../woocommerce/woocommerce.php';
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-esraw-shipping-easy-rate.php';
 }
 require_once plugin_dir_path( __FILE__ ) . 'includes/functions.php';
 
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-esraw-shipping-easy-rate.php';
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
