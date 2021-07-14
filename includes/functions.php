@@ -38,3 +38,35 @@ function esraw_get_cart_volume() {
 	}
 	return $volume / $rate;
 }
+
+function esraw_get_shipping_zones_list_for_import() {
+	global $wpdb;
+	$results   = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}woocommerce_shipping_zones" );
+	$to_return = array();
+	if ( is_array( $results ) ) {
+		foreach ( $results as $result ) {
+			$to_return[ $result->zone_id ] = $result->zone_name;
+		}
+	}
+	return $to_return;
+}
+
+function esraw_get_shipping_list_for_export() {
+	global $wpdb;
+	$results = $wpdb->get_results(
+		$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_shipping_zone_methods WHERE method_id=%s", Esraw_Shipping_Easy_Rate::METHOD_ID )
+	);
+
+	$to_return = array();
+	if ( is_array( $results ) ) {
+		foreach ( $results as $result ) {
+			$option = get_option( 'woocommerce_' . Esraw_Shipping_Easy_Rate::METHOD_ID . '_' . $result->instance_id . '_settings' );
+			if ( is_array( $option ) && isset( $option['method_title'] ) ) {
+				$to_return[ $result->instance_id ] = $option['method_title'];
+			} else {
+				// wp_die( __( 'Couldn\'t get shipping list', 'esraw-woo' ) );
+			}
+		}
+	}
+	return $to_return;
+}

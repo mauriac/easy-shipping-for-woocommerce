@@ -124,4 +124,160 @@ class Esraw_Admin {
 		$methods[ Esraw_Shipping_Easy_Rate::METHOD_ID ] = 'Esraw_Shipping_Easy_Rate';
 		return $methods;
 	}
+
+	public function add_admin_menu() {
+		add_menu_page( 'Easy Shipping Rate', 'Easy Shipping Rate', 'manage_options', 'easy_shipping_rate', array( $this, 'export_page' ) );
+		add_submenu_page( 'easy_shipping_rate', 'Import Easy Shipping Methods', 'Import Shipping Methods', 'manage_options', 'import-methods-esraw', array( $this, 'import_page' ) );
+	}
+	public function export_page() {
+		if ( isset( $_POST['esraw_securite_nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['esraw_securite_nonce'] ), 'esraw-security' ) ) {
+			if ( isset( $_POST['esraw_shipping_export_field'] ) ) {
+				ob_end_clean();
+				$export_data = $_POST['esraw_shipping_export_field'];
+
+				$csv_file = 'easy_rate_shipping_methods_' . date( 'Ymd_His' ) . '.csv';
+				header( 'Content-Type: text/csv' );
+				header( "Content-Disposition: attachment; filename=\"$csv_file\"" );
+				$fh      = fopen( 'php://output', 'w' );
+				$records = array();
+				foreach ( $export_data as $key => $ship_instance_id ) {
+					$method_instance = get_option( 'woocommerce_' . Esraw_Shipping_Easy_Rate::METHOD_ID . '_' . $ship_instance_id . '_settings' );
+
+					$method_condition = get_option( Esraw_Shipping_Easy_Rate::METHOD_ID . $ship_instance_id );
+					if ( is_array( $method_instance ) && is_array( $method_condition ) ) {
+						$method_instance['next']  = 'yes';
+						$method_condition['next'] = 'no';
+						$records[]                = array( wp_json_encode( $method_instance ) );
+						$records[]                = array( wp_json_encode( $method_condition ) );
+					} else {
+						wp_die( __( 'Couldn\'t get export file', 'esraw-woo' ) );
+					}
+				}
+				if ( ! empty( $records ) ) {
+					foreach ( $records as $record ) {
+						fputcsv( $fh, $record );
+					}
+					fclose( $fh );
+				}
+				die;
+			}
+		}
+		?>
+		<div class="wrap">
+			<form method="POST">
+				<table class="form-table">
+					<tr valign="top">
+						<div class="col-auto my-1">
+							<th scope="row">
+								<strong>
+									<?php esc_html_e( 'Export Methods', 'esraw-woo' ); ?>
+								</strong>
+							</th>
+							<td>
+								<select multiple name="esraw_shipping_export_field[]" id="esraw_shipping_export_field">
+									<?php
+									$methods = esraw_get_shipping_list_for_export();
+									foreach ( $methods as $key => $method ) :
+										?>
+									<option value="<?php echo $key; ?>"><?php echo $method; ?></option>
+									<?php endforeach; ?>
+								</select>
+							</td>
+						</div>
+					</tr>
+				</table>
+				<input type="hidden" name="esraw_securite_nonce" value="<?php echo esc_html( wp_create_nonce( 'esraw-security' ) ); ?>"/>
+				<span ><?php submit_button( 'Generate Export File' ); ?></span>
+			</form>
+		</div>
+		<?php
+	}
+
+	public function import_page() {
+		if ( isset( $_POST['esraw_securite_nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['esraw_securite_nonce'] ), 'esraw-security' ) ) {
+			if ( isset( $_POST['esraw_shipping_zones_import'] ) && $_FILES['esraw_import_file'] ) {
+
+				// get export data from file.
+				if ( isset( $_FILES['esraw_import_file']['tmp_name'] ) ) {
+					$file = $_FILES['esraw_import_file']['tmp_name'];
+
+					$zones     = wp_unslash( $_POST['esraw_shipping_zones_import'] );
+					$is_import = false;
+					foreach ( $zones as $key => $zone_id ) {
+						$zone = new WC_Shipping_Zone( $zone_id );
+
+						if ( ( $handle = fopen( $file, 'r' ) ) !== false ) {
+							$ship_instance_id = null;
+							while ( ( $data = fgetcsv( $handle, 1000, ',' ) ) !== false ) {
+								$data_decode = json_decode( current( $data ), true );
+								if ( 'yes' === $data_decode['next'] ) {
+									$ship_instance_id = $zone->add_shipping_method( Esraw_Shipping_Easy_Rate::METHOD_ID );
+
+									unset( $data_decode['next'] );
+									update_option( 'woocommerce_' . Esraw_Shipping_Easy_Rate::METHOD_ID . '_' . $ship_instance_id . '_settings', $data_decode );
+								} elseif ( 'no' === $data_decode['next'] && isset( $ship_instance_id ) && $ship_instance_id ) {
+									unset( $data_decode['next'] );
+									update_option( Esraw_Shipping_Easy_Rate::METHOD_ID . $ship_instance_id, $data_decode );
+								}
+							}
+							fclose( $handle );
+							$is_import = true;
+						}
+					}
+					if ( $is_import ) {
+						?>
+							<div class="notice notice-success is-dismissible">
+								<p><?php esc_html_e( 'Shipping method import successfully!', 'esraw-woo' ); ?></p>
+							</div>
+						<?php
+					}
+				}
+			}
+		}
+		?>
+		<div class="wrap">
+			<form method="POST" enctype="multipart/form-data">
+				<table class="form-table">
+					<tr valign="top">
+						<div class="col-auto my-1">
+							<th scope="row">
+								<strong>
+									<?php esc_html_e( 'zones', 'esraw-woo' ); ?>
+								</strong>
+							</th>
+							<td>
+								<select multiple name="esraw_shipping_zones_import[]" id="esraw_shipping_zones_import">
+									<?php
+									$zones = esraw_get_shipping_zones_list_for_import();
+									foreach ( $zones as $key => $zone ) :
+										?>
+									<option value="<?php echo $key; ?>"><?php echo $zone; ?></option>
+									<?php endforeach; ?>
+								</select>
+							</td>
+						</div>
+					</tr>
+					<tr valign="top">
+						<div class="col-auto my-1">
+							<th scope="row">
+								<strong>
+									<?php esc_html_e( 'files', 'esraw-woo' ); ?>
+								</strong>
+							</th>
+							<td>
+								<input type="file" name="esraw_import_file" id="esraw_import_file" accept=".csv">
+							</td>
+						</div>
+					</tr>
+				</table>
+				<input type="hidden" name="esraw_securite_nonce" value="<?php echo esc_html( wp_create_nonce( 'esraw-security' ) ); ?>"/>
+				<span ><?php submit_button( __( 'Import methods', 'esraw-woo' ) ); ?></span>
+			</form>
+		</div>
+		<?php
+	}
+
+	public function delete_shipping_conditions( $instance_id ) {
+		delete_option( Esraw_Shipping_Easy_Rate::METHOD_ID . $instance_id );
+	}
 }

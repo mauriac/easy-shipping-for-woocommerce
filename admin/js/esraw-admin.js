@@ -1,6 +1,10 @@
 (function ($) {
 	'use strict';
 	$(function () {
+		// for export method.
+		$( '#esraw_shipping_export_field' ).select2({ minimumResultsForSearch: 2 });
+		$( '#esraw_shipping_zones_import' ).select2({ minimumResultsForSearch: 2 });
+
 		$("select[id*='easy_rate_condition_']").each(function (index) {
 			$(this).on('change', function () {
 				let condition_val = $(this).val();

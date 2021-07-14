@@ -29,7 +29,6 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 	const METHOD_DIM_FACTOR          = 'method_dim_factor';
 	const METHOD_ID                  = 'esraw';
 	const CONFIG_HIDE_ALL            = 'config_hide_method';
-	const METHOD_EXPORT_FIELD        = 'method_export_field';
 
 	/**
 	 * Min amount to be valid.
@@ -346,11 +345,11 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 		$this->instance_form_fields = $settings;
 
 		$form_sets         = array(
-			'config_general'          => array(
+			'config_general'      => array(
 				'title' => __( 'General Settings', 'esraw-woo' ),
 				'type'  => 'title',
 			),
-			self::CONFIG_HIDE_ALL     => array(
+			self::CONFIG_HIDE_ALL => array(
 				'title'       => __( 'Hide method', 'esraw-woo' ),
 				'type'        => 'select',
 				'default'     => '',
@@ -361,18 +360,9 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 				'description' => __( 'this option not only includes the methods of this plugin but also the free shipping of woocommerce', 'esraw-woo' ),
 				'desc_tip'    => true,
 			),
-			'section_export_ship'     => array(
+			'section_export_ship' => array(
 				'title' => __( 'Export shipping Method', 'esraw-woo' ),
 				'type'  => 'title',
-			),
-			self::METHOD_EXPORT_FIELD => array(
-				'title'       => __( 'Export', 'esraw-woo' ),
-				'type'        => 'multiselect',
-				'class'       => 'wc-enhanced-select',
-				'default'     => '',
-				'options'     => self::get_shipping_list_for_export(),
-				'description' => __( 'Select methods that will be export', 'esraw-woo' ),
-				'desc_tip'    => true,
 			),
 		);
 		$this->form_fields = $form_sets;
@@ -407,89 +397,8 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			$settings_html = $this->instance_options();
 		} else {
 			$settings_html = $this->generate_settings_html( $this->get_form_fields() );
-			?>
-			<tr valign="top">
-				<td>
-					<button id="esraw_export_btn" class="button-primary woocommerce-save-button" type="submit" value="<?php esc_attr_e( 'Export', 'esraw-woo' ); ?>"><?php esc_html_e( 'Export', 'esraw-woo' ); ?></button>
-				</td>
-			</tr>
-			<?php
-			wp_enqueue_script( 'esraw-ship-1', plugin_dir_url( __FILE__ ) . 'js/esraw-ship.js', array( 'jquery' ), 'ESRAW_VERSION', false );
 		}
 		return '<table class="form-table">' . $settings_html . '</table>';
-	}
-
-	public function get_export_file() {
-
-			$export_data = filter_input( INPUT_POST, 'export_data', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
-
-			$records = array();
-		foreach ( $export_data as $key => $ship_instance_id ) {
-			$method_instance  = get_option( 'woocommerce_' . self::METHOD_ID . '_' . $ship_instance_id . '_settings' );
-			$method_condition = get_option( self::METHOD_ID . $ship_instance_id );
-			if ( is_array( $method_instance ) && is_array( $method_condition ) ) {
-				$method_instance['next']  = 'yes';
-				$method_condition['next'] = 'no';
-				$records[]                = array( wp_json_encode( $method_instance ) );
-				$records[]                = array( wp_json_encode( $method_condition ) );
-			} else {
-				wp_die( __( 'Couldn\'t get export file', 'esraw-woo' ) );
-			}
-		}
-		if ( ! empty( $records ) ) {
-			foreach ( $records as $record ) {
-				fputcsv( $fh, $record );
-			}
-			fclose( $fh );
-		}
-			exit;
-	}
-
-	public function export_esraw_ship() {
-
-		// get export data from file
-			// $row = 1;
-			// if (($handle = fopen("/Applications/MAMP/htdocs/wad_pro/wp-content/plugins/easy-shipping-rate/includes/phpzag_csv_export_20210710.csv", "r")) !== FALSE) {
-			// while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-			// $num = count($data);
-			// echo "<p> $num champs à la ligne $row: <br /></p>\n";
-			// $row++;
-			// $data_decode = json_decode( current( $data ) );
-			// var_dump($data, "decoded", $data_decode);
-			// for ($c=0; $c < $num; $c++) {
-			// echo $data[$c] . "<br />\n";
-			// }
-			// }
-			// fclose($handle);
-			// }
-			// die;
-
-			// $csv_file = "phpzag_csv_export_".date('Ymd') . ".csv";
-			// header("Content-Type: text/csv");
-			// header("Content-Disposition: attachment; filename=\"$csv_file\"");
-			// $fh = fopen( 'php://output', 'w' );
-			// $is_coloumn = true;
-			// if(!empty($records)) {
-			// foreach($records as $record) {
-			// foreach ($record as $key => $rec) {
-			// fputcsv($fh, array_keys($rec));
-			// fputcsv($fh, $rec);
-			// }
-			// if($is_coloumn) {
-			// fputcsv($fh, array_keys($record));
-			// $is_coloumn = false;
-			// }
-			// var_dump($record);
-			// die;
-			// fputcsv($fh, $record);
-			// }
-			// fclose($fh);
-			// }
-			// exit;
-
-		// $export_data       = filter_input( INPUT_POST, 'export_data', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
-
-		// $connection_key = filter_input( INPUT_POST, 'connection_key' );
 	}
 
 	/**
