@@ -76,7 +76,8 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 		'User Details'        => array(
 			'Zipcode'   => 'zipcode',
 			'City'      => 'city',
-			// 'Country'   => 'country',
+			'State'     => 'state',
+			'Country'   => 'country',
 			'User role' => 'user_roles',
 		),
 	);
@@ -486,6 +487,10 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 													<input type="text" placeholder="postcode1,postcode2,etc." name="easy_rate[<?php esc_attr_e( $key ); ?>][choices]" value="<?php esc_attr_e( $condition['choices'] ); ?>"/>
 												<?php elseif ( 'city' === $condition['condition'] ) : ?>
 													<input type="text" placeholder="city1,city2,etc." name="easy_rate[<?php esc_attr_e( $key ); ?>][choices]" value="<?php esc_attr_e( $condition['choices'] ); ?>"/>
+												<?php elseif ( 'state' === $condition['condition'] ) : ?>
+													<input type="text" placeholder="state1,state2,etc." name="easy_rate[<?php esc_attr_e( $key ); ?>][choices]" value="<?php esc_attr_e( $condition['choices'] ); ?>"/>
+												<?php elseif ( 'country' === $condition['condition'] ) : ?>
+													<input type="text" placeholder="country1,country2,etc." name="easy_rate[<?php esc_attr_e( $key ); ?>][choices]" value="<?php esc_attr_e( $condition['choices'] ); ?>"/>
 												<?php else : ?>
 													<input type="number"  step="0.01" value="<?php esc_attr_e( $condition['operand1'] ); ?>" placeholder="from" name="easy_rate[<?php esc_attr_e( $key ); ?>][operand1]"/>
 													<input type="number" step="0.01" value="<?php esc_attr_e( $condition['operand2'] ); ?>" placeholder="to" name="easy_rate[<?php esc_attr_e( $key ); ?>][operand2]"/>
@@ -643,6 +648,34 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 
 					$array_compa = true;
 					if ( in_array( strtolower( $customer_city ), $p_city_slice_lower, true ) ) {
+						$can_get_cost = true;
+					}
+				} elseif ( 'state' === $condition['condition'] ) {
+					$states                  = WC()->countries->get_states( WC()->customer->get_shipping_country() );
+					$customer_state          = ! empty( $states[ WC()->customer->get_shipping_state() ] ) ? $states[ WC()->customer->get_shipping_state() ] : null;
+						$p_state_slice       = explode( ',', $condition['choices'] );
+						$p_state_slice_lower = array_map(
+							function( $p ) {
+								return strtolower( $p );
+							},
+							$p_state_slice
+						);
+						$array_compa         = true; // differencie les champs qui ont d'operand de ceux qui n'en ont pas.
+					if ( in_array( strtolower( $customer_state ), $p_state_slice_lower, true ) ) {
+						$can_get_cost = true;
+					}
+				} elseif ( 'country' === $condition['condition'] ) {
+					$customer_country      = WC()->countries->countries[ WC()->customer->get_shipping_country() ];
+					$p_country_slice       = explode( ',', $condition['choices'] );
+					$p_country_slice_lower = array_map(
+						function( $p ) {
+							return strtolower( $p );
+						},
+						$p_country_slice
+					);
+
+					$array_compa = true;
+					if ( in_array( strtolower( $customer_country ), $p_country_slice_lower, true ) ) {
 						$can_get_cost = true;
 					}
 				}

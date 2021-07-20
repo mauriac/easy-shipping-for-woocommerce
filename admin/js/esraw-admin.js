@@ -2,16 +2,16 @@
 	'use strict';
 	$(function () {
 		// for export method.
-		$( '#esraw_shipping_export_field' ).select2({ minimumResultsForSearch: 2 });
-		$( '#esraw_shipping_zones_import' ).select2({ minimumResultsForSearch: 2 });
+		$('#esraw_shipping_export_field').select2({ minimumResultsForSearch: 2 });
+		$('#esraw_shipping_zones_import').select2({ minimumResultsForSearch: 2 });
 
 		$("select[id*='easy_rate_condition_']").each(function (index) {
 			$(this).on('change', function () {
 				let condition_val = $(this).val();
 				let add_for_calcul = create_operators(index, condition_val);
 				$('#easy_rate_operator_content_' + index).html(add_for_calcul);
-				$( '#esraw_ship_class' ).select2({ minimumResultsForSearch: 2 });
-				$( '#esraw_user_roles' ).select2({ minimumResultsForSearch: 2 });
+				$('#esraw_ship_class').select2({ minimumResultsForSearch: 2 });
+				$('#esraw_user_roles').select2({ minimumResultsForSearch: 2 });
 			});
 		});
 
@@ -54,13 +54,13 @@
 				let condition_val = $(this).val();
 				let add_for_calcul = create_operators(last_tr_key, condition_val);
 				$('#easy_rate_operator_content_' + last_tr_key).html(add_for_calcul);
-				$( '#esraw_ship_class' ).select2({ minimumResultsForSearch: 2 });
-				$( '#esraw_user_roles' ).select2({ minimumResultsForSearch: 2 });
+				$('#esraw_ship_class').select2({ minimumResultsForSearch: 2 });
+				$('#esraw_user_roles').select2({ minimumResultsForSearch: 2 });
 			});
 		});
 		//select2
-		$( '#esraw_ship_class' ).select2({ minimumResultsForSearch: 2 });
-		$( '#esraw_user_roles' ).select2({ minimumResultsForSearch: 2 });
+		$('#esraw_ship_class').select2({ minimumResultsForSearch: 2 });
+		$('#esraw_user_roles').select2({ minimumResultsForSearch: 2 });
 
 		function create_content(p) {
 			let cond_choices = esr_vars.esraw_condition_choices;
@@ -173,6 +173,12 @@
 			} else if ('city' == val) {
 				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
 					'<input type="text" placeholder="city1,city2,etc." name="easy_rate[' + p + '][choices]"/>';
+			} else if ('state' == val) {
+				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
+					'<input type="text" placeholder="state1,state2,etc." name="easy_rate[' + p + '][choices]"/>';
+			} else if ('country' == val) {
+				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
+					'<input type="text" placeholder="country1,country2,etc." name="easy_rate[' + p + '][choices]"/>';
 			}
 
 			return content;
