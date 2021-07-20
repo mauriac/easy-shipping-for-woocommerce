@@ -710,6 +710,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 						$cost      = 0;
 						$temp_cost = 0;
 						$label     = $this->get_instance_option( self::METHOD_FREE_SHIPPING_LABEL, $this->title );
+						break; // corriger freeshipping. desactiver le champs prix avec du js
 					}
 				}
 			}
