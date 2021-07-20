@@ -80,7 +80,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			'User role' => 'user_roles',
 		),
 	);
-	const Operator           = array(
+	const OPERATOR           = array(
 		'is'     => 'is',
 		'is_not' => 'is not',
 	);
@@ -460,7 +460,7 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 											</select>
 											<span class="easy_rate_operator_content" id="easy_rate_operator_content_<?php esc_attr_e( $key ); ?>">
 												<select id="easy_rate_operator_<?php esc_attr_e( $key ); ?>" name="easy_rate[<?php esc_attr_e( $key ); ?>][operator]" required>
-													<?php foreach ( self::Operator as $op_key => $operat ) : ?>
+													<?php foreach ( self::OPERATOR as $op_key => $operat ) : ?>
 														<option value="<?php esc_attr_e( $op_key ); ?>" <?php ( $op_key === $condition['operator'] ) ? esc_attr_e( 'selected' ) : ''; ?>>
 															<?php esc_attr_e( $operat ); ?>
 														</option>
