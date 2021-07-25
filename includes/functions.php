@@ -70,3 +70,15 @@ function esraw_get_shipping_list_for_export() {
 	}
 	return $to_return;
 }
+function esraw_get_products_for_ship_conditions() {
+	$args      = array(
+		'type'  => array( 'simple', 'variation', 'variable' ),
+		'limit' => -1,
+	);
+	$products  = wc_get_products( $args );
+	$to_return = array();
+	foreach ( $products as $prod ) {
+		$to_return[ $prod->get_id() ] = $prod->get_name();
+	}
+	return $to_return;
+}

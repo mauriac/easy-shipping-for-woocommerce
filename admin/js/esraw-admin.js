@@ -12,6 +12,7 @@
 				$('#easy_rate_operator_content_' + index).html(add_for_calcul);
 				$('#esraw_ship_class').select2({ minimumResultsForSearch: 2 });
 				$('#esraw_user_roles').select2({ minimumResultsForSearch: 2 });
+				$('#esraw_products_list_class').select2({ minimumResultsForSearch: 2 });
 			});
 		});
 
@@ -56,11 +57,13 @@
 				$('#easy_rate_operator_content_' + last_tr_key).html(add_for_calcul);
 				$('#esraw_ship_class').select2({ minimumResultsForSearch: 2 });
 				$('#esraw_user_roles').select2({ minimumResultsForSearch: 2 });
+				$('#esraw_products_list_class').select2({ minimumResultsForSearch: 2 });
 			});
 		});
 		//select2
 		$('#esraw_ship_class').select2({ minimumResultsForSearch: 2 });
 		$('#esraw_user_roles').select2({ minimumResultsForSearch: 2 });
+		$('#esraw_products_list_class').select2({ minimumResultsForSearch: 2 });
 
 		function create_content(p) {
 			let cond_choices = esr_vars.esraw_condition_choices;
@@ -154,6 +157,19 @@
 
 				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
 					'<select multiple id="esraw_ship_class" style="overflow: scroll; height: 35px;" name="easy_rate[' + p + '][choices][]" required>' + ship_options + '</select>';
+			} else if ('contains_product' == val) {
+				let products_list = esr_vars.esraw_products_list_array;
+				let prod_options = '';
+
+				for (const key_ship in products_list) {
+					if (Object.hasOwnProperty.call(products_list, key_ship)) {
+						const choices = products_list[key_ship];
+						prod_options += '<option value="' + key_ship + '">' + choices + '</option>';
+					}
+				}
+
+				content = '<select id="easy_rate_operator_' + p + '" name="easy_rate[' + p + '][operator]" required>' + select_options + '</select>' +
+					'<select multiple id="esraw_products_list_class" style="overflow: scroll; height: 35px;" name="easy_rate[' + p + '][choices][]" required>' + prod_options + '</select>';
 			} else if ('user_roles' == val) {
 				let user_roles = esr_vars.esraw_user_roles;
 				let options = '';

@@ -80,6 +80,9 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 			'Country'   => 'country',
 			'User role' => 'user_roles',
 		),
+		'Products'            => array(
+			'Contains product' => 'contains_product',
+		),
 	);
 	const OPERATOR           = array(
 		'is'     => 'is',
@@ -475,6 +478,14 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 															</option>
 														<?php endforeach; ?>
 													</select>
+												<?php elseif ( 'contains_product' === $condition['condition'] ) : ?>
+													<select multiple style="overflow: scroll;height: 35px;" name="easy_rate[<?php esc_attr_e( $key ); ?>][choices][]" required="" id="esraw_products_list_class">
+														<?php foreach ( esraw_get_products_for_ship_conditions() as $choice_key => $choice_class_value ) : ?>
+															<option value="<?php esc_attr_e( $choice_key ); ?>" <?php in_array( $choice_key, $condition['choices'] ) ? esc_attr_e( 'selected' ) : ''; ?>>
+																<?php esc_attr_e( $choice_class_value ); ?>
+															</option>
+														<?php endforeach; ?>
+													</select>
 												<?php elseif ( 'user_roles' === $condition['condition'] ) : ?>
 													<select multiple id="esraw_user_roles" style="overflow: scroll;height: 35px;" name="easy_rate[<?php esc_attr_e( $key ); ?>][choices][]" required="">
 														<?php foreach ( esraw_get_user_roles() as $choice_role_key => $choice_role_name ) : ?>
@@ -678,6 +689,19 @@ class Esraw_Shipping_Easy_Rate extends WC_Shipping_Method {
 					if ( in_array( strtolower( $customer_country ), $p_country_slice_lower, true ) ) {
 						$can_get_cost = true;
 					}
+				} elseif ( 'contains_product' === $condition['condition'] ) {
+					$cart_items = wc()->cart->get_cart();
+					foreach ( $cart_items as $item ) {
+						$product_id = $item['product_id'];
+						if ( isset( $item['variation_id'] ) && ! empty( $item['variation_id'] ) ) {
+							$product_id = $item['variation_id'];
+						}
+						if ( in_array( strval( $product_id ), $condition['choices'], true ) ) {
+							$can_get_cost = true;
+							break;
+						}
+					}
+					$array_compa = true;
 				}
 
 				if ( ! $array_compa ) {
